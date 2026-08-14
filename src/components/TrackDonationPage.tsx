@@ -21,12 +21,16 @@ import {
   ChevronRight,
   HeartHandshake,
   RotateCcw,
-  BadgeCheck
+  BadgeCheck,
+  AlertTriangle,
+  KeyRound,
+  PlayCircle
 } from 'lucide-react';
 import { TrackingRecord, JourneyStep, JourneyStepStatus } from '../types';
-import { getDonationById, getUserCreatedDonationsList, getAllDonations } from '../data/donationStore';
+import { getDonationById, getUserCreatedDonationsList, getAllDonations, resetDemoDonation } from '../data/donationStore';
 import { SAMPLE_TRACKING_RECORDS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
+import { VolunteerDeliveryFlow } from './VolunteerDeliveryFlow';
 
 interface TrackDonationPageProps {
   initialTrackingId?: string;
@@ -36,7 +40,7 @@ interface TrackDonationPageProps {
 }
 
 export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
-  initialTrackingId = 'RR-1042',
+  initialTrackingId = 'RR-DEMO-1042',
   onNavigateHome,
   onNavigateDonate,
   onSelectTrackingId
@@ -71,6 +75,12 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
   useEffect(() => {
     const refreshList = () => {
       setSavedUserDonations(getUserCreatedDonationsList());
+      if (searchedId) {
+        const refreshed = getDonationById(searchedId);
+        if (refreshed) {
+          setCurrentRecord(refreshed);
+        }
+      }
     };
     refreshList();
 
@@ -78,7 +88,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
     return () => {
       window.removeEventListener('amanat_donations_changed', refreshList);
     };
-  }, []);
+  }, [searchedId]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +111,8 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
   };
 
   const handleTryDemo = () => {
-    handleQuickSelectId('RR-1042');
+    resetDemoDonation();
+    handleQuickSelectId('RR-DEMO-1042');
   };
 
   const handleCopyTrackingId = (idToCopy?: string) => {
@@ -115,10 +126,26 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
 
   // Helper to determine step display text and state
   const getStepData = (record: TrackingRecord) => {
-    const totalStepsCount = 6;
-    const currentIdx = record.currentStepIndex ?? 5;
+    const currentIdx = record.currentStepIndex ?? (record.isDemo ? 3 : 5);
 
-    // Standardized descriptions matching user instructions
+    // If record has explicit steps defined (like RR-DEMO-1042), map those
+    if (record.steps && record.steps.length > 0) {
+      return record.steps.map((step) => {
+        return {
+          key: step.key,
+          titleEn: step.title,
+          titleUr: step.urduTitle,
+          status: step.status,
+          timestamp: step.timestamp,
+          explanation: step.description,
+          location: step.location || `${record.city}, ${record.province}`,
+          details: step.details,
+          proofMedia: step.proofMedia
+        };
+      });
+    }
+
+    // Standardized descriptions fallback
     const standardExplanations: Record<string, { en: string; ur: string }> = {
       received: {
         en: 'Your donation has been recorded.',
@@ -135,6 +162,10 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
       volunteer_assigned: {
         en: 'A delivery volunteer has been assigned.',
         ur: 'ترسیل کے لیے رضاکار تعینات کر دیا گیا ہے۔'
+      },
+      in_transit: {
+        en: 'Ration packages are in transit to doorstep.',
+        ur: 'راشن دہلیز پر ترسیل کے لیے روانہ ہے۔'
       },
       delivered: {
         en: 'Your ration has been delivered.',
@@ -182,6 +213,13 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
         defaultDescUr: 'ترسیل کے لیے فیلڈ رضاکار تعینات کیا گیا ہے۔'
       },
       {
+        key: 'in_transit',
+        titleEn: 'In Transit',
+        titleUr: 'راستے میں ہے',
+        defaultDescEn: 'Ration is in transit to destination.',
+        defaultDescUr: 'راشن منزل کی طرف روانہ ہے۔'
+      },
+      {
         key: 'delivered',
         titleEn: 'Delivered',
         titleUr: 'دہلیز پر ترسیل',
@@ -198,24 +236,19 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
     ];
 
     return stepDefinitions.map((stepDef, idx) => {
-      // Find matching step from record if exists
-      const existingStep = record.steps?.find((s) => s.key === stepDef.key);
-
       let status: JourneyStepStatus = 'pending';
       if (idx < currentIdx) {
         status = 'completed';
       } else if (idx === currentIdx) {
-        status = currentIdx === 5 ? 'completed' : 'current';
+        status = currentIdx >= 6 ? 'completed' : 'current';
       } else {
         status = 'pending';
       }
 
-      // If record says current step index is 5, then all 6 steps are completed
-      if (currentIdx >= 5) {
+      if (currentIdx >= 6) {
         status = 'completed';
       }
 
-      const timestamp = existingStep?.timestamp || (status === 'completed' ? 'Verified on Ground' : undefined);
       const explanation = isUrdu 
         ? (standardExplanations[stepDef.key]?.ur || stepDef.defaultDescUr)
         : (standardExplanations[stepDef.key]?.en || stepDef.defaultDescEn);
@@ -223,11 +256,8 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
       return {
         ...stepDef,
         status,
-        timestamp,
         explanation,
-        location: existingStep?.location || `${record.city}, ${record.province}`,
-        details: existingStep?.details,
-        proofMedia: existingStep?.proofMedia
+        location: `${record.city}, ${record.province}`,
       };
     });
   };
@@ -236,33 +266,37 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
   const getStatusBadge = (record: TrackingRecord) => {
     const currentIdx = record.currentStepIndex ?? 5;
     
-    if (currentIdx >= 5) {
+    // Check if fully verified
+    const isFullyDone = currentIdx >= (record.steps?.length ? record.steps.length - 1 : 5) && 
+                        record.steps?.every(s => s.status === 'completed');
+
+    if (isFullyDone || currentIdx >= 6 || (record.steps && record.steps[record.steps.length - 1]?.status === 'completed')) {
       return {
-        labelEn: 'Delivered & Verified',
-        labelUr: 'ترسیل اور تصدیق مکمل',
+        labelEn: 'Delivered & Recipient Verified',
+        labelUr: 'ترسیل اور مستحق کی تصدیق مکمل',
         bg: 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-200/80',
         badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
         icon: <ShieldCheck className="w-5 h-5 text-emerald-100 shrink-0" />
       };
     }
 
-    if (currentIdx === 4) {
+    if (currentIdx === 5 || record.steps?.find(s => s.key === 'delivered')?.status === 'completed') {
       return {
-        labelEn: 'Delivered to Doorstep',
-        labelUr: 'دہلیز پر ترسیل مکمل',
-        bg: 'bg-teal-600 text-white border-teal-500',
-        badgeColor: 'bg-teal-100 text-teal-900 border-teal-300',
-        icon: <Truck className="w-5 h-5 text-teal-100 shrink-0" />
+        labelEn: 'Delivered (Awaiting OTP Verification)',
+        labelUr: 'دہلیز پر ترسیل مکمل (او ٹی پی تصدیق زیرِ عمل)',
+        bg: 'bg-amber-600 text-white border-amber-500',
+        badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+        icon: <KeyRound className="w-5 h-5 text-amber-100 shrink-0" />
       };
     }
 
-    if (currentIdx === 3) {
+    if (currentIdx === 4 || currentIdx === 3 || record.steps?.find(s => s.key === 'in_transit')?.status === 'current') {
       return {
-        labelEn: 'Volunteer Assigned & En Route',
-        labelUr: 'رضاکار روانہ ہے',
+        labelEn: 'Volunteer Assigned & In Transit',
+        labelUr: 'رضاکار تعینات اور روانہ ہے',
         bg: 'bg-blue-600 text-white border-blue-500',
         badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
-        icon: <Truck className="w-5 h-5 text-blue-100 shrink-0" />
+        icon: <Truck className="w-5 h-5 text-blue-100 shrink-0 animate-pulse" />
       };
     }
 
@@ -299,11 +333,12 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
   const getDeliveredCount = (record: TrackingRecord) => {
     const currentIdx = record.currentStepIndex ?? 5;
     const totalBags = record.rationBagsCount || 3;
+    const isDeliveredStepCompleted = record.steps?.find(s => s.key === 'delivered')?.status === 'completed';
     
-    if (currentIdx >= 4) {
+    if (isDeliveredStepCompleted || currentIdx >= 5) {
       return totalBags;
     }
-    if (currentIdx >= 2) {
+    if (currentIdx >= 3) {
       return Math.max(1, Math.floor(totalBags / 2));
     }
     return 0;
@@ -334,15 +369,25 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
             </button>
           )}
 
-          {onNavigateDonate && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={onNavigateDonate}
-              className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200 transition-colors cursor-pointer"
+              onClick={handleTryDemo}
+              className="inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-full border border-amber-300 transition-colors cursor-pointer"
             >
-              <HeartHandshake className="w-3.5 h-3.5" />
-              <span>{isUrdu ? 'نیا عطیہ دیں' : 'Donate & Track'}</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+              <span>{isUrdu ? 'جج ڈیمو موڈ (RR-DEMO-1042)' : 'Try Demo Mode (RR-DEMO-1042)'}</span>
             </button>
-          )}
+
+            {onNavigateDonate && (
+              <button
+                onClick={onNavigateDonate}
+                className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition-colors cursor-pointer"
+              >
+                <HeartHandshake className="w-3.5 h-3.5" />
+                <span>{isUrdu ? 'نیا عطیہ دیں' : 'Donate & Track'}</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* SECTION 1: SEARCH HEADER & INPUT */}
@@ -358,8 +403,8 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
               {isUrdu 
-                ? 'اپنے عطیہ کی منفرد ٹریکنگ آئی ڈی (مثلاً RR-1042) درج کریں اور راشن کی تیاری سے لے کر مستحق خاندان تک ترسیل کا لائیو سفر دیکھیں۔'
-                : 'Enter your unique Amanat Donation ID to view ground verification, OTP confirmation, and live courier delivery timeline.'}
+                ? 'اپنے عطیہ کی منفرد ٹریکنگ آئی ڈی درج کریں یا جج ایویلیوایشن کے لیے انٹرایکٹو ڈیمو آزمائیں۔'
+                : 'Enter your unique Amanat Donation ID or try the interactive Judge Demo Mode (RR-DEMO-1042) to test courier hand-off and OTP verification.'}
             </p>
           </div>
 
@@ -372,7 +417,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                   type="text"
                   value={inputTrackId}
                   onChange={(e) => setInputTrackId(e.target.value)}
-                  placeholder={isUrdu ? 'عطیہ آئی ڈی درج کریں (مثلاً RR-1042)' : 'Enter Donation ID (e.g. RR-1042)'}
+                  placeholder={isUrdu ? 'عطیہ آئی ڈی درج کریں (مثلاً RR-DEMO-1042)' : 'Enter Donation ID (e.g. RR-DEMO-1042)'}
                   className={`w-full ${direction === 'rtl' ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3.5 rounded-xl border-2 border-slate-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 bg-white text-slate-900 font-mono text-base font-bold placeholder:text-slate-400 uppercase tracking-wider outline-none transition-all`}
                 />
               </div>
@@ -389,7 +434,18 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
 
           {/* Quick Demo & User Donation Chips */}
           <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="text-slate-600 font-semibold">{isUrdu ? 'ڈیمو آئی ڈیز آزمائیں:' : 'Try Sample ID:'}</span>
+            <span className="text-slate-600 font-semibold">{isUrdu ? 'ڈیمو آئی ڈیز آزمائیں:' : 'Quick Select:'}</span>
+            <button
+              onClick={() => handleQuickSelectId('RR-DEMO-1042')}
+              className={`px-3 py-1 rounded-lg font-mono font-bold border transition-colors cursor-pointer flex items-center gap-1.5 ${
+                searchedId === 'RR-DEMO-1042'
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-xs'
+                  : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+              }`}
+            >
+              <Sparkles className="w-3 h-3 text-amber-600" />
+              <span>RR-DEMO-1042 (Judge Demo)</span>
+            </button>
             <button
               onClick={() => handleQuickSelectId('RR-1042')}
               className={`px-2.5 py-1 rounded-lg font-mono font-bold border transition-colors cursor-pointer ${
@@ -398,7 +454,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                   : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
               }`}
             >
-              RR-1042 (Verified)
+              RR-1042
             </button>
             <button
               onClick={() => handleQuickSelectId('AMT-2026-FLOOD-8821')}
@@ -410,22 +466,12 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
             >
               AMT-2026-FLOOD-8821
             </button>
-            <button
-              onClick={() => handleQuickSelectId('AMT-2026-RAMDN-4019')}
-              className={`px-2.5 py-1 rounded-lg font-mono font-bold border transition-colors cursor-pointer ${
-                searchedId === 'AMT-2026-RAMDN-4019'
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
-              }`}
-            >
-              AMT-2026-RAMDN-4019
-            </button>
 
             {/* If user created their own donations, show them here */}
             {savedUserDonations.length > 0 && (
               <div className="w-full flex flex-wrap items-center justify-center gap-1.5 mt-2 pt-2 border-t border-dashed border-slate-200">
                 <span className="text-[11px] font-bold text-emerald-700">{isUrdu ? 'آپ کے تخلیق کردہ عطیات:' : 'Your Created Donations:'}</span>
-                {savedUserDonations.slice(0, 3).map((d) => (
+                {savedUserDonations.filter(d => !d.isDemo).slice(0, 3).map((d) => (
                   <button
                     key={d.trackingId}
                     onClick={() => handleQuickSelectId(d.trackingId)}
@@ -456,17 +502,17 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
             <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
               {isUrdu
                 ? `آئی ڈی "${searchedId || inputTrackId}" ڈیٹا بیس میں موجود نہیں ہے۔ براہ کرم درست آئی ڈی درج کریں یا ڈیمو عطیہ آزمائیں۔`
-                : `We couldn't find a record for "${searchedId || inputTrackId}". Please verify the ID format (e.g. RR-1042) or try our live demo.`}
+                : `We couldn't find a record for "${searchedId || inputTrackId}". Please verify the ID format (e.g. RR-DEMO-1042) or try our live demo.`}
             </p>
 
             {/* Action Buttons */}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={handleTryDemo}
-                className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-xl shadow-md shadow-emerald-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-extrabold rounded-xl shadow-md shadow-amber-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>{isUrdu ? 'ڈیمو آزمائیں (RR-1042)' : 'Try Demo'}</span>
+                <span>{isUrdu ? 'ڈیمو آزمائیں (RR-DEMO-1042)' : 'Try Demo Mode (RR-DEMO-1042)'}</span>
               </button>
 
               {onNavigateDonate && (
@@ -486,6 +532,45 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
           /* STATE B: VALID COMPLETE TRACKING PAGE */
           <div className="space-y-8 animate-in fade-in duration-300">
             
+            {/* PROMINENT DEMO DATA BANNER (If isDemo or RR-DEMO-1042) */}
+            {(currentRecord.isDemo || currentRecord.trackingId.includes('DEMO')) && (
+              <div className="bg-linear-to-r from-amber-500 via-amber-600 to-amber-500 text-white rounded-2xl p-5 shadow-lg border-2 border-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-6 h-6 text-white animate-spin-slow" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-widest uppercase bg-slate-900 text-amber-300 border border-amber-300/40">
+                        Demo Data
+                      </span>
+                      <span className="text-xs font-bold text-amber-100">
+                        Judge & Evaluator Interactive Mode
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-white/90 mt-0.5">
+                      {isUrdu
+                        ? 'یہ ایک ڈیمو عطیہ ہے جو بیرونی SMS یا ادائیگی کے بغیر مکمل کام کرتا ہے۔ رضاکار ڈیش بورڈ کھول کر ڈیلیوری کی تصدیق کریں۔'
+                        : 'This interactive pre-created donation is configured for evaluation. Open the volunteer flow below to simulate OTP confirmation.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('volunteer-flow-container');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Truck className="w-4 h-4 text-amber-400" />
+                    <span>{isUrdu ? 'رضاکار ڈیش بورڈ کھولیں' : 'Open Volunteer Flow'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 1. TOP STATUS BADGE & MAIN DETAILS CARD */}
             <div className="bg-white rounded-2xl shadow-md border border-slate-200/90 overflow-hidden">
               
@@ -509,8 +594,13 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
+                      {currentRecord.isDemo && (
+                        <span className="px-3 py-1 rounded-full bg-slate-900 text-amber-300 text-xs font-bold border border-amber-300/40">
+                          Demo Data
+                        </span>
+                      )}
                       <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold border border-white/30 backdrop-blur-xs">
-                        {isUrdu ? '100% تصدیق شدہ' : '100% Zero Leakage'}
+                        {isUrdu ? '100% شفاف لیجر' : '100% Zero Leakage'}
                       </span>
                     </div>
                   </div>
@@ -523,9 +613,16 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                   
                   {/* Item 1: Donation ID */}
                   <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
-                    <span className="text-xs font-semibold text-slate-500 block">
-                      {isUrdu ? 'عطیہ ٹریکنگ آئی ڈی' : 'Donation ID'}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-500 block">
+                        {isUrdu ? 'عطیہ ٹریکنگ آئی ڈی' : 'Donation ID'}
+                      </span>
+                      {currentRecord.isDemo && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          Demo
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-lg sm:text-xl font-extrabold font-mono text-emerald-800 preserve-ltr">
                         {currentRecord.trackingId}
@@ -540,7 +637,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                     </div>
                     <span className="text-[11px] text-slate-500 flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      <span>{isUrdu ? 'تصدیق شدہ امانت لیجر' : 'Verified Audit Token'}</span>
+                      <span>{currentRecord.isDemo ? 'Demo Verification Ledger' : 'Verified Audit Token'}</span>
                     </span>
                   </div>
 
@@ -576,7 +673,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
 
             </div>
 
-            {/* 2. "YOUR IMPACT" CARD */}
+            {/* 2. "YOUR IMPACT" CARD (3 packages / 3 families) */}
             {(() => {
               const totalBags = currentRecord.rationBagsCount || 3;
               const deliveredCount = getDeliveredCount(currentRecord);
@@ -591,18 +688,25 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                         <Sparkles className="w-5 h-5 text-emerald-700" />
                       </div>
                       <div>
-                        <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                          {isUrdu ? 'آپ کا اثر' : 'Your Impact'}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                            {isUrdu ? 'آپ کا اثر' : 'Your Impact'}
+                          </h3>
+                          {currentRecord.isDemo && (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                              Demo Data
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-slate-500">
-                          {isUrdu ? 'زمین پر آپ کے عطیہ کے ذریعے حاصل ہونے والی براہِ راست امداد' : 'Measurable ground relief delivered to verified families'}
+                          {isUrdu ? '3 راشن پیکجز برائے 3 مستحق خاندان' : '3 ration packages for 3 verified families'}
                         </p>
                       </div>
                     </div>
 
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 self-start sm:self-auto">
                       <BadgeCheck className="w-4 h-4 text-emerald-600" />
-                      <span>{isUrdu ? 'شفاف تقسیم' : '100% Handover'}</span>
+                      <span>{deliveredCount >= totalBags ? (isUrdu ? '100% ترسیل مکمل' : '100% Verified') : (isUrdu ? 'ترسیل جاری' : 'Delivery Active')}</span>
                     </span>
                   </div>
 
@@ -680,19 +784,36 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
               );
             })()}
 
-            {/* 3. LARGE VISUAL TIMELINE (6 EXACT STAGES) */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+            {/* 3. INTERACTIVE VOLUNTEER DASHBOARD CONTAINER (For Demo Mode) */}
+            {(currentRecord.isDemo || currentRecord.trackingId.includes('DEMO')) && (
+              <div id="volunteer-flow-container" className="scroll-mt-24">
+                <VolunteerDeliveryFlow
+                  currentRecord={currentRecord}
+                  onStatusUpdated={(updated) => setCurrentRecord(updated)}
+                />
+              </div>
+            )}
+
+            {/* 4. LARGE VISUAL TIMELINE (Exact 7 Stages for Demo Mode or Standard 6) */}
+            <div id="tracking-timeline-anchor" className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6 scroll-mt-24">
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-emerald-700" />
-                    <span>{isUrdu ? 'عطیہ کا لائیو سفر اور ٹائم لائن' : 'Live Aid Journey Timeline'}</span>
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-emerald-700" />
+                      <span>{isUrdu ? 'عطیہ کا لائیو سفر اور ٹائم لائن' : 'Live Aid Journey Timeline'}</span>
+                    </h3>
+                    {currentRecord.isDemo && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                        Demo Data
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {isUrdu 
-                      ? 'ہر مرحلے پر وقت، مقام اور زمینی تصدیق کی تفصیلات' 
-                      : 'End-to-end audit trail distinguishing completed, current, and upcoming stages.'}
+                      ? 'عطیہ موصول → راشن مخصوص → پیکنگ → رضاکار تعینات → راستے میں → دہلیز پر ترسیل → مستحق کی تصدیق' 
+                      : 'Donation Received → Ration Allocated → Ration Prepared → Volunteer Assigned → In Transit → Delivered → Recipient Verified'}
                   </p>
                 </div>
 
@@ -709,7 +830,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                 </div>
               </div>
 
-              {/* The 6 Large Timeline Steps */}
+              {/* The Timeline Steps */}
               <div className="relative pl-2 sm:pl-4 space-y-8 pt-2">
                 
                 {getStepData(currentRecord).map((step, idx, array) => {
@@ -832,7 +953,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
 
             </div>
 
-            {/* 4. VERIFICATION AUDIT & GROUND DETAILS */}
+            {/* 5. VERIFICATION AUDIT & GROUND DETAILS */}
             <div className="bg-slate-900 text-slate-100 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
                 <div className="flex items-center gap-3">
@@ -840,9 +961,16 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="text-base sm:text-lg font-bold text-white">
-                      {isUrdu ? 'امانت گراؤنڈ تصدیقی ثبوت' : 'Ground Verification Proof'}
-                    </h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-base sm:text-lg font-bold text-white">
+                        {isUrdu ? 'امانت گراؤنڈ تصدیقی ثبوت' : 'Ground Verification Proof'}
+                      </h4>
+                      {currentRecord.isDemo && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Demo Data
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-400">
                       {isUrdu ? 'مستحق کوڈ، او ٹی پی ویریفکیشن اور جی پی ایس ٹیگز' : 'Tamper-proof digital tokens and recipient authentication'}
                     </p>
@@ -851,7 +979,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
 
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-mono font-bold border border-emerald-500/20">
-                    OTP: VERIFIED-100%
+                    {currentRecord.steps?.every(s => s.status === 'completed') ? 'OTP: VERIFIED-100%' : 'OTP: PENDING-DISPATCH'}
                   </span>
                 </div>
               </div>
@@ -860,14 +988,14 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                 <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-1">
                   <span className="text-slate-400 block font-semibold">{isUrdu ? 'مستحق فیملی ٹوکن:' : 'Beneficiary Code:'}</span>
                   <span className="font-mono text-emerald-400 font-bold text-sm block">
-                    {currentRecord.recipientFamilyCode || 'FAM-SKR-UC12-1042'}
+                    {currentRecord.recipientFamilyCode || 'FAM-DEMO-UC12-1042'}
                   </span>
                 </div>
 
                 <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-1">
                   <span className="text-slate-400 block font-semibold">{isUrdu ? 'تعینات رضاکار:' : 'Assigned Field Lead:'}</span>
                   <span className="font-bold text-slate-200 text-sm block">
-                    {currentRecord.volunteerName || 'Muhammad Salman (Verified)'}
+                    {currentRecord.volunteerName || 'Muhammad Salman (Demo Volunteer)'}
                   </span>
                 </div>
 
@@ -897,7 +1025,7 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
               )}
             </div>
 
-            {/* 5. FOOTER ACTIONS */}
+            {/* 6. FOOTER ACTIONS */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
               <button
                 onClick={() => handleCopyTrackingId(currentRecord.trackingId)}
@@ -907,18 +1035,33 @@ export const TrackDonationPage: React.FC<TrackDonationPageProps> = ({
                 <span>{copiedId ? (isUrdu ? 'کاپی ہو گیا!' : 'Copied to Clipboard') : (isUrdu ? 'ٹریکنگ لنک کاپی کریں' : 'Copy Tracking Link')}</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setInputTrackId('');
-                  setSearchedId('');
-                  setCurrentRecord(null);
-                  setHasSearched(false);
-                }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>{isUrdu ? 'دوسرا عطیہ تلاش کریں' : 'Track Another Donation'}</span>
-              </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {currentRecord.isDemo && (
+                  <button
+                    onClick={() => {
+                      const reset = resetDemoDonation();
+                      setCurrentRecord(reset);
+                    }}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>{isUrdu ? 'ڈیمو ری سیٹ کریں' : 'Reset Demo'}</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setInputTrackId('');
+                    setSearchedId('');
+                    setCurrentRecord(null);
+                    setHasSearched(false);
+                  }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{isUrdu ? 'دوسرا عطیہ تلاش کریں' : 'Track Another Donation'}</span>
+                </button>
+              </div>
             </div>
 
           </div>

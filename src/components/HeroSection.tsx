@@ -129,15 +129,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               id="hero-demo-btn"
               onClick={() => {
                 if (onOpenTrackPage) {
-                  onOpenTrackPage('RR-1042');
+                  onOpenTrackPage('RR-DEMO-1042');
                 } else {
-                  onOpenDemo('RR-1042');
+                  onOpenDemo('RR-DEMO-1042');
                 }
               }}
-              className="px-6 py-3.5 rounded-full bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 text-sm sm:text-base font-bold border border-emerald-200 shadow-2xs flex items-center gap-2 transition-all cursor-pointer"
+              className="px-6 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-900 text-sm sm:text-base font-bold border border-amber-300 shadow-2xs flex items-center gap-2 transition-all cursor-pointer"
             >
-              <PlayCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{t('heroBtnTryDemo')}</span>
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>{t('heroBtnTryDemo')} (Demo)</span>
             </button>
           </div>
 

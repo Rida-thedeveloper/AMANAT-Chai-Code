@@ -5,6 +5,7 @@ export type StepKey =
   | 'allocated' 
   | 'prepared' 
   | 'volunteer_assigned' 
+  | 'in_transit'
   | 'delivered' 
   | 'verified';
 
@@ -52,13 +53,15 @@ export interface TrackingRecord {
   partnerNgo: string;
   volunteerName?: string;
   volunteerPhoneMasked?: string;
-  currentStepIndex: number; // 0 to 5
+  currentStepIndex: number; // 0 to total steps
   steps: JourneyStep[];
   deliveredDate?: string;
   recipientFamilyCode?: string;
   gpsCoordinates?: string;
   createdAt?: string;
   isUserCreated?: boolean;
+  isDemo?: boolean;
+  demoOtp?: string;
 }
 
 export interface ReliefCampaign {
