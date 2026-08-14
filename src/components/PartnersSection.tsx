@@ -1,25 +1,28 @@
 import React from 'react';
 import { Building2, ShieldCheck, HeartHandshake, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const PartnersSection: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
+
   const partnerTypes = [
     {
-      name: 'Registered Welfare Trusts',
-      urdu: 'رجسٹرڈ فلاحی ادارے',
-      description: 'Audited non-profit foundations operating vetted community hubs across Pakistan.',
-      badge: 'Certified'
+      name: t('partner1Title'),
+      urdu: isUrdu ? '' : 'رجسٹرڈ فلاحی ادارے',
+      description: t('partner1Desc'),
+      badge: t('partner1Badge')
     },
     {
-      name: 'Local Union Council Relief Desks',
-      urdu: 'یونین کونسل ریلیف ڈیسک',
-      description: 'Grassroots verification units on the ground in rural Sindh, Punjab, KP & Balochistan.',
-      badge: 'Direct Field'
+      name: t('partner2Title'),
+      urdu: isUrdu ? '' : 'یونین کونسل ریلیف ڈیسک',
+      description: t('partner2Desc'),
+      badge: t('partner2Badge')
     },
     {
-      name: 'Independent Logistics Fleets',
-      urdu: 'مستقل ٹرانسپورٹ نیٹ ورک',
-      description: '4x4 flood convoys, snow rescue teams, and urban doorstep distribution vans.',
-      badge: 'GPS Tracked'
+      name: t('partner3Title'),
+      urdu: isUrdu ? '' : 'مستقل ٹرانسپورٹ نیٹ ورک',
+      description: t('partner3Desc'),
+      badge: t('partner3Badge')
     }
   ];
 
@@ -30,13 +33,13 @@ export const PartnersSection: React.FC = () => {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-200">
             <Building2 className="w-3.5 h-3.5 text-emerald-600" />
-            Vetted Partner Ecosystem
+            {t('partnersBadge')}
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Collaborating with authentic Pakistani ground partners
+            {t('partnersHeading')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-2">
-            Amanat powers verification software for verified aid networks, ensuring transparency without slowing down relief operations.
+            {t('partnersSubheading')}
           </p>
         </div>
 
@@ -51,14 +54,16 @@ export const PartnersSection: React.FC = () => {
                   <span className="px-3 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                     {partner.badge}
                   </span>
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900 mb-1">
                   {partner.name}
                 </h3>
-                <p className="font-urdu text-xs font-bold text-emerald-700 mb-3">
-                  {partner.urdu}
-                </p>
+                {partner.urdu && (
+                  <p className="font-urdu text-xs font-bold text-emerald-700 mb-3">
+                    {partner.urdu}
+                  </p>
+                )}
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {partner.description}
                 </p>

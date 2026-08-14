@@ -12,12 +12,15 @@ import {
   Truck,
   HeartHandshake
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProblemSolutionSectionProps {
   onOpenDemo?: () => void;
 }
 
 export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ onOpenDemo }) => {
+  const { isUrdu, t } = useLanguage();
+
   return (
     <section id="problem-solution" className="py-16 sm:py-24 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,13 +29,13 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider mb-3 border border-slate-200">
             <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-            The Trust Gap in Aid
+            {t('psBadge')}
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
-            After you donate, what happens?
+            {t('psHeading')}
           </h2>
           <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
-            Traditional donations disappear into a black box. Amanat replaces uncertainty with end-to-end chain of custody.
+            {t('psSubheading')}
           </p>
         </div>
 
@@ -46,9 +49,9 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
               <div className="flex items-center justify-between pb-5 border-b border-slate-200 mb-6">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
-                    Traditional Charity
+                    {t('psTraditionalTitle')}
                   </span>
-                  <h3 className="text-xl font-bold text-slate-900 mt-2">The Black Box</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mt-2">{t('psTraditionalSubtitle')}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-lg">
                   ✕
@@ -61,12 +64,12 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 {/* 1. Donate */}
                 <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-700">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-700 shrink-0">
                       1
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900">Donate</p>
-                      <p className="text-xs text-slate-500">You transfer funds or hand over cash.</p>
+                      <p className="text-sm font-bold text-slate-900">{t('psTradStep1Title')}</p>
+                      <p className="text-xs text-slate-500">{t('psTradStep1Desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -75,20 +78,20 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 <div className="flex flex-col items-center justify-center py-1 text-rose-500">
                   <ArrowDown className="w-4 h-4 text-slate-400 mb-1" />
                   <span className="text-xs font-bold bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1.5 shadow-2xs">
-                    <HelpCircle className="w-3.5 h-3.5 text-rose-600" />
-                    Where did my money go?
+                    <HelpCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                    {t('psTradQuestion1')}
                   </span>
                 </div>
 
                 {/* 2. Unseen Intermediate */}
                 <div className="p-4 rounded-2xl bg-white/60 border border-dashed border-slate-300 text-slate-400">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400 shrink-0">
                       ?
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-500">Zero Updates / General Fund</p>
-                      <p className="text-xs text-slate-400">No receipt ID, no ration allotment tracking.</p>
+                      <p className="text-sm font-semibold text-slate-500">{t('psTradStep2Title')}</p>
+                      <p className="text-xs text-slate-400">{t('psTradStep2Desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -97,20 +100,20 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 <div className="flex flex-col items-center justify-center py-1 text-rose-500">
                   <ArrowDown className="w-4 h-4 text-slate-400 mb-1" />
                   <span className="text-xs font-bold bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1.5 shadow-2xs">
-                    <HelpCircle className="w-3.5 h-3.5 text-rose-600" />
-                    Did the ration actually reach someone?
+                    <HelpCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                    {t('psTradQuestion2')}
                   </span>
                 </div>
 
                 {/* 3. Unknown Outcome */}
                 <div className="p-4 rounded-2xl bg-white/60 border border-dashed border-slate-300 text-slate-400">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400 shrink-0">
                       ?
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-500">Unverifiable Distribution</p>
-                      <p className="text-xs text-slate-400">Relying on vague annual reports.</p>
+                      <p className="text-sm font-semibold text-slate-500">{t('psTradStep3Title')}</p>
+                      <p className="text-xs text-slate-400">{t('psTradStep3Desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -119,8 +122,8 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
             </div>
 
             <div className="mt-8 pt-4 border-t border-slate-200 text-xs text-slate-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
-              <span>Result: High donor hesitation and trust fatigue.</span>
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span>{t('psTradResult')}</span>
             </div>
           </div>
 
@@ -131,9 +134,9 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
               <div className="flex items-center justify-between pb-5 border-b border-emerald-900 mb-6">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-900/80 px-3 py-1 rounded-full border border-emerald-700">
-                    Amanat Standard
+                    {t('psSolutionBadge')}
                   </span>
-                  <h3 className="text-xl font-bold text-white mt-2">100% Trackable Journey</h3>
+                  <h3 className="text-xl font-bold text-white mt-2">{t('psSolutionSubtitle')}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-emerald-500/20">
                   ✓
@@ -146,16 +149,16 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 {/* 1. Donate */}
                 <div className="p-3.5 rounded-2xl bg-emerald-900/70 border border-emerald-700/60 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white shrink-0">
                       1
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">Donate</p>
-                      <p className="text-[11px] text-emerald-200">Unique tracking ID generated immediately.</p>
+                      <p className="text-sm font-bold text-white">{t('psSolStep1Title')}</p>
+                      <p className="text-[11px] text-emerald-200">{t('psSolStep1Desc')}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200">
-                    ID ISSUED
+                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200 shrink-0">
+                    {t('psSolStep1Badge')}
                   </span>
                 </div>
 
@@ -166,16 +169,16 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 {/* 2. Track */}
                 <div className="p-3.5 rounded-2xl bg-emerald-900/70 border border-emerald-700/60 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white shrink-0">
                       2
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">Track</p>
-                      <p className="text-[11px] text-emerald-200">Live warehouse allotment, packaging & transit GPS.</p>
+                      <p className="text-sm font-bold text-white">{t('psSolStep2Title')}</p>
+                      <p className="text-[11px] text-emerald-200">{t('psSolStep2Desc')}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200">
-                    LIVE STATUS
+                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200 shrink-0">
+                    {t('psSolStep2Badge')}
                   </span>
                 </div>
 
@@ -186,16 +189,16 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 {/* 3. Deliver */}
                 <div className="p-3.5 rounded-2xl bg-emerald-900/70 border border-emerald-700/60 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white shrink-0">
                       3
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">Deliver</p>
-                      <p className="text-[11px] text-emerald-200">Verified ground volunteer brings ration to doorstep.</p>
+                      <p className="text-sm font-bold text-white">{t('psSolStep3Title')}</p>
+                      <p className="text-[11px] text-emerald-200">{t('psSolStep3Desc')}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200">
-                    VOLUNTEER
+                  <span className="text-[10px] font-mono font-bold bg-emerald-800 px-2 py-0.5 rounded text-emerald-200 shrink-0">
+                    {t('psSolStep3Badge')}
                   </span>
                 </div>
 
@@ -206,18 +209,18 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
                 {/* 4. Verify */}
                 <div className="p-3.5 rounded-2xl bg-emerald-800 border-2 border-emerald-400 shadow-md flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white text-emerald-900 flex items-center justify-center font-extrabold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-white text-emerald-900 flex items-center justify-center font-extrabold text-xs shrink-0">
                       4
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white flex items-center gap-1.5">
-                        Verify <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                        {t('psSolStep4Title')} <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
                       </p>
-                      <p className="text-[11px] text-emerald-100">Recipient confirms handover using SMS OTP.</p>
+                      <p className="text-[11px] text-emerald-100">{t('psSolStep4Desc')}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-white text-emerald-900 px-2 py-0.5 rounded">
-                    OTP CONFIRMED
+                  <span className="text-[10px] font-mono font-bold bg-white text-emerald-900 px-2 py-0.5 rounded shrink-0">
+                    {t('psSolStep4Badge')}
                   </span>
                 </div>
 
@@ -227,14 +230,14 @@ export const ProblemSolutionSection: React.FC<ProblemSolutionSectionProps> = ({ 
             <div className="mt-8 pt-4 border-t border-emerald-900 text-xs text-emerald-300 flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                Zero leakage • Cryptographic transparency
+                {t('psSolResult')}
               </span>
               {onOpenDemo && (
                 <button 
                   onClick={onOpenDemo}
                   className="font-bold text-emerald-200 hover:text-white underline cursor-pointer text-xs"
                 >
-                  View Sample Track
+                  {t('psSolViewDemo')}
                 </button>
               )}
             </div>

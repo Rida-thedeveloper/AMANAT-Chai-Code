@@ -5,8 +5,34 @@
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     scroll-behavior: smooth;
   }
+
+  html[dir="rtl"],
+  .font-urdu-content {
+    font-family: 'Noto Nastaliq Urdu', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
 }
 
 .font-urdu {
   font-family: 'Noto Nastaliq Urdu', 'Plus Jakarta Sans', serif;
+  line-height: 1.8;
+}
+
+/* Ensure Urdu typography has pleasant line-height and letter-spacing */
+html[dir="rtl"] body {
+  line-height: 1.7;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
+
+/* Preserve direction for English alphanumeric codes, phone numbers, tracking numbers */
+.preserve-ltr,
+.font-mono,
+[data-ltr] {
+  direction: ltr !important;
+  text-align: left;
+  unicode-bidi: isolate;
 }

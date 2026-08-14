@@ -4,6 +4,7 @@ import {
   HeartHandshake, 
   ShieldCheck, 
   ArrowRight, 
+  ArrowLeft,
   CreditCard, 
   Smartphone, 
   Building, 
@@ -13,6 +14,7 @@ import {
   Lock
 } from 'lucide-react';
 import { RELIEF_CAMPAIGNS } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 interface DonateModalProps {
   isOpen: boolean;
@@ -25,6 +27,7 @@ export const DonateModal: React.FC<DonateModalProps> = ({
   onClose, 
   onDonationComplete 
 }) => {
+  const { isUrdu, t, formatPKR, direction } = useLanguage();
   const [selectedCampaignId, setSelectedCampaignId] = useState(RELIEF_CAMPAIGNS[0].id);
   const [amount, setAmount] = useState<number>(3500);
   const [customAmount, setCustomAmount] = useState<string>('');
@@ -76,22 +79,22 @@ export const DonateModal: React.FC<DonateModalProps> = ({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
+          className={`absolute ${isUrdu ? 'left-5' : 'right-5'} top-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer`}
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shadow-xs shrink-0">
             <HeartHandshake className="w-6 h-6" />
           </div>
           <div>
             <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Donate & Track
+              {t('donateModalTitle')}
             </h3>
             <p className="text-xs text-slate-500">
-              Receive your live tracking ID and SMS status updates immediately.
+              {t('donateModalSubtitle')}
             </p>
           </div>
         </div>
@@ -101,7 +104,7 @@ export const DonateModal: React.FC<DonateModalProps> = ({
           {/* Campaign Selector */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
-              Select Verified Relief Drive
+              {t('donateSelectDrive')}
             </label>
             <select
               value={selectedCampaignId}
@@ -110,7 +113,7 @@ export const DonateModal: React.FC<DonateModalProps> = ({
             >
               {RELIEF_CAMPAIGNS.map((camp) => (
                 <option key={camp.id} value={camp.id}>
-                  {camp.title} ({camp.location})
+                  {isUrdu ? camp.urduTitle : camp.title} ({camp.location})
                 </option>
               ))}
             </select>
@@ -119,8 +122,10 @@ export const DonateModal: React.FC<DonateModalProps> = ({
           {/* Amount Selection */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide flex justify-between">
-              <span>Select Donation Amount</span>
-              <span className="text-emerald-700 font-bold">~{rationBagsCount} Ration Bag{rationBagsCount > 1 ? 's' : ''}</span>
+              <span>{t('donateSelectAmount')}</span>
+              <span className="text-emerald-700 font-bold">
+                ~{rationBagsCount} {isUrdu ? 'راشن بیگ' : `Ration Bag${rationBagsCount > 1 ? 's' : ''}`}
+              </span>
             </label>
             <div className="grid grid-cols-3 gap-2 mb-2.5">
               {[3500, 7000, 17500].map((preset) => (
@@ -134,22 +139,28 @@ export const DonateModal: React.FC<DonateModalProps> = ({
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <p className="font-mono text-sm">₨ {preset.toLocaleString()}</p>
-                  <p className="text-[10px] opacity-80">{preset === 3500 ? '1 Bag' : preset === 7000 ? '2 Bags' : '5 Bags'}</p>
+                  <p className="font-mono text-sm">{formatPKR(preset)}</p>
+                  <p className="text-[10px] opacity-80">
+                    {preset === 3500 
+                      ? (isUrdu ? '1 بیگ' : '1 Bag') 
+                      : preset === 7000 
+                        ? (isUrdu ? '2 بیگز' : '2 Bags') 
+                        : (isUrdu ? '5 بیگز' : '5 Bags')}
+                  </p>
                 </button>
               ))}
             </div>
 
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono">
+              <span className={`absolute ${isUrdu ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono`}>
                 PKR
               </span>
               <input
                 type="number"
-                placeholder="Or enter custom amount in PKR"
+                placeholder={t('donateCustomPlaceholder')}
                 value={customAmount}
                 onChange={handleCustomAmountChange}
-                className="w-full pl-12 pr-4 py-2.5 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className={`w-full ${isUrdu ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-2.5 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600`}
               />
             </div>
           </div>
@@ -158,12 +169,12 @@ export const DonateModal: React.FC<DonateModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Your Name / Donor Name
+                {t('donateDonorName')}
               </label>
               <input
                 type="text"
                 disabled={isAnonymous}
-                placeholder={isAnonymous ? "Anonymous Donor" : "e.g. Asad Khan"}
+                placeholder={isAnonymous ? (isUrdu ? "گمنام عطیہ دہندہ" : "Anonymous Donor") : (isUrdu ? "مثلاً اسد خان" : "e.g. Asad Khan")}
                 value={donorName}
                 onChange={(e) => setDonorName(e.target.value)}
                 className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 disabled:opacity-50"
@@ -172,14 +183,14 @@ export const DonateModal: React.FC<DonateModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Mobile Number (for SMS Tracking)
+                {t('donateMobileLabel')}
               </label>
               <input
                 type="tel"
                 placeholder="0300-1234567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                className="w-full px-3.5 py-2 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 preserve-ltr"
               />
             </div>
           </div>
@@ -193,21 +204,21 @@ export const DonateModal: React.FC<DonateModalProps> = ({
               className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
             />
             <label htmlFor="anonymous-check" className="text-xs text-slate-600 font-medium cursor-pointer">
-              Keep my name private on public transparency ledger
+              {t('donatePrivacyCheck')}
             </label>
           </div>
 
           {/* Payment Method Selector */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
-              Payment Gateway in Pakistan
+              {t('donatePaymentGateway')}
             </label>
             <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'raast', label: 'Raast P2P', icon: <QrCode className="w-4 h-4" /> },
                 { id: 'jazzcash', label: 'JazzCash', icon: <Smartphone className="w-4 h-4" /> },
                 { id: 'easypaisa', label: 'EasyPaisa', icon: <Smartphone className="w-4 h-4" /> },
-                { id: 'card', label: 'Debit Card', icon: <CreditCard className="w-4 h-4" /> },
+                { id: 'card', label: isUrdu ? 'بینک کارڈ' : 'Debit Card', icon: <CreditCard className="w-4 h-4" /> },
               ].map((pm) => (
                 <button
                   type="button"
@@ -235,19 +246,23 @@ export const DonateModal: React.FC<DonateModalProps> = ({
             {isSubmitting ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Generating Your Amanat Tracking ID...
+                {t('donateGenerating')}
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5" />
-                <span>Confirm ₨ {amount.toLocaleString()} & Generate Tracking ID</span>
-                <ArrowRight className="w-4 h-4" />
+                <ShieldCheck className="w-5 h-5 shrink-0" />
+                <span>{t('donateConfirmBtn')} ({formatPKR(amount)})</span>
+                {direction === 'rtl' ? (
+                  <ArrowLeft className="w-4 h-4 shrink-0" />
+                ) : (
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                )}
               </span>
             )}
           </button>
 
           <p className="text-[11px] text-center text-slate-400">
-            🔒 Bank-grade 256-bit encryption • 100% Direct aid distribution guarantee
+            {t('donateEncryptionNotice')}
           </p>
 
         </form>

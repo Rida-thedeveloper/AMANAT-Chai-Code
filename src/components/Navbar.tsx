@@ -6,9 +6,10 @@ import {
   X, 
   HeartHandshake, 
   Sparkles, 
-  ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Globe
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   onOpenTracker: (sampleId?: string) => void;
@@ -19,6 +20,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSection, onDonateClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navSearchId, setNavSearchId] = useState('');
+  const { language, setLanguage, isUrdu, t } = useLanguage();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +40,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
   };
 
   const navItems = [
-    { label: 'Problem & Solution', id: 'problem-solution' },
-    { label: 'How It Works', id: 'how-it-works' },
-    { label: 'Live Tracking', id: 'courier-tracking' },
-    { label: 'Active Relief Drives', id: 'active-drives' },
-    { label: 'Transparency', id: 'transparency' },
+    { label: t('navProblemSolution'), id: 'problem-solution' },
+    { label: t('navHowItWorks'), id: 'how-it-works' },
+    { label: t('navLiveTracking'), id: 'courier-tracking' },
+    { label: t('navActiveDrives'), id: 'active-drives' },
+    { label: t('navTransparency'), id: 'transparency' },
   ];
 
   return (
@@ -52,16 +54,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">
-              PAKISTAN RELIEF
+              {isUrdu ? 'پاکستان ریلیف' : 'PAKISTAN RELIEF'}
             </span>
-            <span className="hidden sm:inline">🇵🇰 Real-time transparent donation tracking for flood relief, Ramadan & emergency aid.</span>
-            <span className="sm:hidden font-urdu">آپ کی امانت، صحیح ہاتھوں تک</span>
+            <span className="hidden sm:inline">
+              {isUrdu 
+                ? '🇵🇰 سیلاب ریلیف، رمضان راشن اور ہنگامی امداد کے لیے شفاف لائیو ٹریکنگ سسٹم۔' 
+                : '🇵🇰 Real-time transparent donation tracking for flood relief, Ramadan & emergency aid.'}
+            </span>
+            <span className="sm:hidden font-urdu text-xs">
+              {isUrdu ? 'آپ کی امانت، صحیح ہاتھوں تک' : 'Aapki Amanat, Sahi Haathon Tak'}
+            </span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] text-emerald-200">
-            <span className="font-urdu text-xs">Aapki Amanat, Sahi Haathon Tak</span>
+          
+          <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-emerald-200">
+            <span className="font-urdu text-xs hidden md:inline-block">
+              {isUrdu ? 'شفافیت اور بروقت ترسیل' : 'Aapki Amanat, Sahi Haathon Tak'}
+            </span>
             <span className="hidden md:inline-block text-emerald-400">•</span>
-            <span className="hidden md:inline-flex items-center gap-1 text-emerald-200 font-semibold">
-              <CheckCircle className="w-3 h-3 text-emerald-400" /> 100% Verified Deliveries
+            <span className="inline-flex items-center gap-1 text-emerald-200 font-semibold">
+              <CheckCircle className="w-3 h-3 text-emerald-400" /> 
+              {isUrdu ? '100% تصدیق شدہ ترسیل' : '100% Verified Deliveries'}
             </span>
           </div>
         </div>
@@ -80,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
             >
               {/* Distinct Emerald Brand Block */}
               <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform">
-                A
+                {isUrdu ? 'ا' : 'A'}
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -92,14 +104,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
                   </span>
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">
-                  Trust & Transparency
+                  {isUrdu ? 'اعتماد اور شفافیت' : 'Trust & Transparency'}
                 </p>
               </div>
             </a>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-600">
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -111,38 +123,94 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
             ))}
           </nav>
 
-          {/* Search + Action Buttons */}
-          <div className="hidden sm:flex items-center gap-4">
+          {/* Search + Action Buttons + Language Switcher */}
+          <div className="hidden sm:flex items-center gap-3 lg:gap-4">
+            
             {/* Quick Track Input in Pill Style */}
             <form onSubmit={handleSearchSubmit} className="flex items-center bg-slate-100 rounded-full px-3.5 py-1.5 border border-slate-200 focus-within:border-emerald-500 focus-within:bg-white transition-all shadow-2xs">
-              <Search className="w-3.5 h-3.5 text-slate-400 mr-2" />
+              <Search className="w-3.5 h-3.5 text-slate-400 mx-1 shrink-0" />
               <input
                 type="text"
-                placeholder="Enter Donation ID (e.g. AMN-102)"
+                placeholder={isUrdu ? 'آئی ڈی (مثلاً AMT-8821)' : 'Donation ID (e.g. AMT-8821)'}
                 value={navSearchId}
                 onChange={(e) => setNavSearchId(e.target.value)}
-                className="bg-transparent border-none text-xs outline-none w-48 xl:w-56 font-mono uppercase text-slate-800 placeholder:normal-case placeholder:font-sans placeholder:text-slate-400"
+                className="bg-transparent border-none text-xs outline-none w-36 lg:w-44 xl:w-52 font-mono uppercase text-slate-800 placeholder:normal-case placeholder:font-sans placeholder:text-slate-400"
               />
               <button 
                 type="submit" 
-                className="text-emerald-700 hover:text-emerald-800 font-bold text-xs tracking-wider uppercase ml-1.5 cursor-pointer"
+                className="text-emerald-700 hover:text-emerald-800 font-bold text-xs tracking-wider uppercase mx-1 cursor-pointer"
               >
-                Track
+                {t('navTrackBtn')}
               </button>
             </form>
+
+            {/* Language Switcher: EN | اردو */}
+            <div className="flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200 shadow-2xs" id="language-switcher-desktop">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  language === 'en'
+                    ? 'bg-white text-emerald-800 shadow-xs border border-slate-200/80'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+                title="Switch to English"
+              >
+                EN
+              </button>
+              <span className="text-slate-300 text-xs px-0.5 select-none">|</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('ur')}
+                className={`px-2.5 py-0.5 rounded-full text-xs font-urdu font-bold transition-all cursor-pointer ${
+                  language === 'ur'
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="اردو میں تبدیل کریں"
+              >
+                اردو
+              </button>
+            </div>
 
             <div className="h-6 w-px bg-slate-200 hidden md:block" />
 
             <button
               onClick={handleDonateAction}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg shadow-emerald-200/80 transition-all cursor-pointer hover:shadow-emerald-300"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 lg:px-5 py-2 rounded-full text-xs font-bold shadow-lg shadow-emerald-200/80 transition-all cursor-pointer hover:shadow-emerald-300 whitespace-nowrap"
             >
-              DONATE NOW
+              {t('navDonateNow')}
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Right Controls: Language switcher + Search button + Menu toggle */}
           <div className="flex sm:hidden items-center gap-2">
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center rounded-full bg-slate-100 p-0.5 border border-slate-200" id="language-switcher-mobile">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
+                  language === 'en'
+                    ? 'bg-white text-emerald-800 shadow-xs'
+                    : 'text-slate-500'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('ur')}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-urdu font-bold transition-all ${
+                  language === 'ur'
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'text-slate-600'
+                }`}
+              >
+                اردو
+              </button>
+            </div>
+
             <button
               onClick={() => onOpenTracker()}
               className="p-2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200"
@@ -168,17 +236,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
               type="text"
-              placeholder="Enter Amanat Track ID (e.g. AMT-2026-FLOOD-8821)"
+              placeholder={isUrdu ? 'ٹریکنگ آئی ڈی درج کریں (مثلاً AMT-2026-FLOOD-8821)' : 'Enter Amanat Track ID (e.g. AMT-2026-FLOOD-8821)'}
               value={navSearchId}
               onChange={(e) => setNavSearchId(e.target.value)}
-              className="w-full pl-9 pr-20 py-2.5 text-sm rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              className="w-full px-9 py-2.5 text-sm rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className={`w-4 h-4 text-slate-400 absolute ${isUrdu ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
             <button
               type="submit"
-              className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-emerald-600 text-white rounded-full text-xs font-bold"
+              className={`absolute ${isUrdu ? 'left-1.5' : 'right-1.5'} top-1.5 bottom-1.5 px-4 bg-emerald-600 text-white rounded-full text-xs font-bold`}
             >
-              Track
+              {t('navTrackBtn')}
             </button>
           </form>
 
@@ -190,7 +258,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
                   onNavigateToSection(item.id);
                   setMobileMenuOpen(false);
                 }}
-                className="text-left px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                className={`text-${isUrdu ? 'right' : 'left'} px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition-colors`}
               >
                 {item.label}
               </button>
@@ -206,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
               className="w-full py-2.5 px-4 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200 flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-emerald-600" />
-              View Sample Live Tracking (Flood Relief)
+              {isUrdu ? 'سیلاب ریلیف کا لائیو ٹریکنگ نمونہ دیکھیں' : 'View Sample Live Tracking (Flood Relief)'}
             </button>
             <button
               onClick={() => {
@@ -216,7 +284,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
               className="w-full py-2.5 px-4 rounded-full bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
             >
               <HeartHandshake className="w-4 h-4" />
-              DONATE NOW
+              {t('navDonateNow')}
             </button>
           </div>
         </div>

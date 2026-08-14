@@ -1,7 +1,10 @@
 import React from 'react';
 import { ShieldCheck, Heart, Phone, Mail, MapPin, Globe, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Footer: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
+
   return (
     <footer className="bg-slate-950 text-slate-300 pt-16 pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,16 +22,18 @@ export const Footer: React.FC = () => {
                   <span className="text-xl font-extrabold text-white tracking-tight">Amanat</span>
                   <span className="font-urdu text-lg font-bold text-emerald-400">امانت</span>
                 </div>
-                <p className="text-xs text-emerald-400 font-medium">Aapki Amanat, Sahi Haathon Tak</p>
+                <p className="text-xs text-emerald-400 font-medium">
+                  {isUrdu ? 'آپ کی امانت، صحیح ہاتھوں تک' : 'Aapki Amanat, Sahi Haathon Tak'}
+                </p>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Pakistan’s open donation transparency & tracking protocol. Ensuring every relief rupee reaches the right hands with proof of delivery.
+              {t('footerMission')}
             </p>
 
             <div className="pt-2 flex items-center gap-2 text-xs text-slate-400">
-              <span>Made with care for Pakistan</span>
+              <span>{t('footerMadeWith')}</span>
               <span>🇵🇰</span>
             </div>
           </div>
@@ -36,20 +41,26 @@ export const Footer: React.FC = () => {
           {/* Quick Tracking Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Sample Tracking IDs
+              {t('footerSampleHeading')}
             </h4>
             <ul className="space-y-2 text-xs text-slate-400 font-mono">
               <li>
                 <span className="text-emerald-400 font-semibold block">AMT-2026-FLOOD-8821</span>
-                <span className="text-slate-500 font-sans">Dadu & Johi Flood Relief (Delivered)</span>
+                <span className="text-slate-500 font-sans">
+                  {isUrdu ? 'دادو و جوہی سیلاب ریلیف (مکمل ترسیل)' : 'Dadu & Johi Flood Relief (Delivered)'}
+                </span>
               </li>
               <li>
                 <span className="text-amber-400 font-semibold block">AMT-2026-RAMDN-4019</span>
-                <span className="text-slate-500 font-sans">Lyari Ramadan Rashan (En Route)</span>
+                <span className="text-slate-500 font-sans">
+                  {isUrdu ? 'لیاری رمضان راشن (راستے میں)' : 'Lyari Ramadan Rashan (En Route)'}
+                </span>
               </li>
               <li>
                 <span className="text-blue-400 font-semibold block">AMT-2026-RATION-1104</span>
-                <span className="text-slate-500 font-sans">Swat Winter Relief (Allocated)</span>
+                <span className="text-slate-500 font-sans">
+                  {isUrdu ? 'سوات موسم سرما راشن (مخصوص شدہ)' : 'Swat Winter Relief (Allocated)'}
+                </span>
               </li>
             </ul>
           </div>
@@ -57,24 +68,24 @@ export const Footer: React.FC = () => {
           {/* Transparency Model */}
           <div className="space-y-3 text-xs text-slate-400">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Core Guarantees
+              {t('footerGuaranteesHeading')}
             </h4>
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span>Real-time SMS & E-Receipt</span>
+                <span>{t('footerG1')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span>Photo & GPS Delivery Audits</span>
+                <span>{t('footerG2')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span>Zero Third-Party Cut Policy</span>
+                <span>{t('footerG3')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span>Beneficiary Dignity & Privacy First</span>
+                <span>{t('footerG4')}</span>
               </li>
             </ul>
           </div>
@@ -82,7 +93,7 @@ export const Footer: React.FC = () => {
           {/* Help & Support Desk */}
           <div className="space-y-3 text-xs text-slate-400">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Relief Helpline
+              {t('footerHelplineHeading')}
             </h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-300">
@@ -91,11 +102,11 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>support@amanat.pk</span>
+                <span className="font-mono">support@amanat.pk</span>
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Pakistan National Disaster Relief Hub</span>
+                <span>{t('footerCenterHub')}</span>
               </div>
             </div>
           </div>
@@ -104,11 +115,11 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 Amanat Pakistan (امانت). All relief tracking data is cryptographically verified.</p>
+          <p>{t('footerCopyright')}</p>
           <div className="flex items-center gap-4 text-slate-400">
-            <span>Aapki Amanat, Sahi Haathon Tak</span>
+            <span>{isUrdu ? 'آپ کی امانت، صحیح ہاتھوں تک' : 'Aapki Amanat, Sahi Haathon Tak'}</span>
             <span className="text-slate-600">•</span>
-            <span className="font-urdu text-emerald-400">آپ کی امانت، صحیح ہاتھوں تک</span>
+            <span className="font-urdu text-emerald-400">امانت پاکستان</span>
           </div>
         </div>
 
