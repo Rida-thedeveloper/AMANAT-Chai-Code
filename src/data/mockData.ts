@@ -252,6 +252,95 @@ export const SAMPLE_TRACKING_RECORDS: Record<string, TrackingRecord> = {
         status: 'pending'
       }
     ]
+  },
+  'RR-1042': {
+    trackingId: 'RR-1042',
+    donorName: 'Anonymous Supporter (Verified)',
+    campaignName: 'Emergency Family Ration & Food Security Drive',
+    campaignCategory: 'Ration',
+    amountPKR: 5000,
+    rationBagsCount: 3,
+    itemsIncluded: [
+      'Atta / Wheat Flour (20kg Bag x 3)',
+      'Cooking Oil / Banaspati Ghee (6 Litres)',
+      'Basmati Rice (5kg)',
+      'Daal Chana & Moong (3kg)',
+      'Refined Sugar & Tea Pack'
+    ],
+    city: 'Sukkur',
+    district: 'Union Council 12 & Rural Sectors',
+    province: 'Sindh',
+    partnerNgo: 'Amanat Relief Logistics Network',
+    volunteerName: 'Muhammad Salman (Registered Aid Worker)',
+    volunteerPhoneMasked: '+92 321 •••• 552',
+    currentStepIndex: 5, // Delivered & Verified
+    gpsCoordinates: '27.7052° N, 68.8574° E',
+    recipientFamilyCode: 'FAM-SKR-UC12-1042',
+    deliveredDate: 'Today, 03:45 PM',
+    createdAt: '14 Aug 2026, 09:30 AM',
+    steps: [
+      {
+        key: 'received',
+        title: 'Donation Received',
+        urduTitle: 'عطیہ موصول ہوا',
+        description: 'Your donation has been recorded.',
+        timestamp: 'Today, 09:30 AM',
+        location: 'Amanat Central Gateway',
+        status: 'completed',
+        details: ['Recorded in digital audit ledger #RR-1042', 'E-Receipt Verified'],
+        proofMedia: { type: 'receipt', label: 'E-Receipt #RR-1042' }
+      },
+      {
+        key: 'allocated',
+        title: 'Ration Allocated',
+        urduTitle: 'راشن مخصوص کیا گیا',
+        description: 'Your contribution has been allocated toward ration packages.',
+        timestamp: 'Today, 11:15 AM',
+        location: 'Sukkur Regional Hub',
+        status: 'completed',
+        details: ['3 ration packages matched with verified distress index UC-12']
+      },
+      {
+        key: 'prepared',
+        title: 'Ration Prepared',
+        urduTitle: 'راشن پیکنگ مکمل',
+        description: '3 ration packages have been prepared.',
+        timestamp: 'Today, 01:20 PM',
+        location: 'Sukkur Central Warehouse',
+        status: 'completed',
+        details: ['Grade-A food items sealed with tamper-proof QR barcode']
+      },
+      {
+        key: 'volunteer_assigned',
+        title: 'Volunteer Assigned',
+        urduTitle: 'رضاکار تعینات',
+        description: 'A delivery volunteer has been assigned.',
+        timestamp: 'Today, 02:30 PM',
+        location: 'Sukkur Logistics Hub',
+        status: 'completed',
+        details: ['Volunteer Muhammad Salman dispatched with delivery unit #04']
+      },
+      {
+        key: 'delivered',
+        title: 'Delivered',
+        urduTitle: 'دہلیز پر ترسیل',
+        description: 'Your ration has been delivered.',
+        timestamp: 'Today, 03:45 PM',
+        location: 'Union Council 12, Sukkur',
+        status: 'completed',
+        details: ['Doorstep delivery completed to identified families']
+      },
+      {
+        key: 'verified',
+        title: 'Recipient Verified',
+        urduTitle: 'مستحق کی تصدیق',
+        description: 'The recipient confirmed delivery using OTP.',
+        timestamp: 'Today, 04:10 PM',
+        location: 'UC-12 Verification Desk',
+        status: 'completed',
+        details: ['Beneficiary confirmed with SMS OTP code', 'NADRA-safe token FAM-SKR-UC12-1042 recorded']
+      }
+    ]
   }
 };
 

@@ -12,10 +12,11 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
-  currentPage?: 'home' | 'donate-track';
+  currentPage?: 'home' | 'donate-track' | 'track';
   onOpenTracker: (sampleId?: string) => void;
   onNavigateToSection: (sectionId: string) => void;
   onOpenDonateAndTrack: () => void;
+  onOpenTrackPage?: (sampleId?: string) => void;
   onDonateClick?: () => void;
 }
 
@@ -24,6 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenTracker, 
   onNavigateToSection, 
   onOpenDonateAndTrack,
+  onOpenTrackPage,
   onDonateClick 
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,7 +35,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (navSearchId.trim()) {
-      onOpenTracker(navSearchId.trim().toUpperCase());
+      const cleanId = navSearchId.trim().toUpperCase();
+      if (onOpenTrackPage) {
+        onOpenTrackPage(cleanId);
+      } else {
+        onOpenTracker(cleanId);
+      }
       setNavSearchId('');
       setMobileMenuOpen(false);
     }
@@ -46,6 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { label: isUrdu ? 'ہوم' : 'Home', id: 'home', isPage: true },
     { label: isUrdu ? 'عطیہ اور ٹریکنگ' : 'Donate & Track', id: 'donate-track', isPage: true },
+    { label: isUrdu ? 'عطیہ ٹریک کریں' : 'Track a Donation', id: 'track', isPage: true },
     { label: t('navProblemSolution'), id: 'problem-solution' },
     { label: t('navHowItWorks'), id: 'how-it-works' },
     { label: t('navLiveTracking'), id: 'courier-tracking' },
@@ -120,7 +128,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-semibold text-slate-600">
             {navItems.map((item) => {
               const isActive = (item.id === 'home' && currentPage === 'home') ||
-                               (item.id === 'donate-track' && currentPage === 'donate-track');
+                               (item.id === 'donate-track' && currentPage === 'donate-track') ||
+                               (item.id === 'track' && currentPage === 'track');
 
               return (
                 <button
@@ -130,6 +139,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onNavigateToSection('home');
                     } else if (item.id === 'donate-track') {
                       onOpenDonateAndTrack();
+                    } else if (item.id === 'track') {
+                      if (onOpenTrackPage) {
+                        onOpenTrackPage();
+                      } else {
+                        onOpenTracker();
+                      }
                     } else {
                       onNavigateToSection(item.id);
                     }
@@ -282,13 +297,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onNavigateToSection('home');
                   } else if (item.id === 'donate-track') {
                     onOpenDonateAndTrack();
+                  } else if (item.id === 'track') {
+                    if (onOpenTrackPage) {
+                      onOpenTrackPage();
+                    } else {
+                      onOpenTracker();
+                    }
                   } else {
                     onNavigateToSection(item.id);
                   }
                   setMobileMenuOpen(false);
                 }}
                 className={`text-${isUrdu ? 'right' : 'left'} px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition-colors ${
-                  (item.id === 'home' && currentPage === 'home') || (item.id === 'donate-track' && currentPage === 'donate-track')
+                  (item.id === 'home' && currentPage === 'home') || 
+                  (item.id === 'donate-track' && currentPage === 'donate-track') ||
+                  (item.id === 'track' && currentPage === 'track')
                     ? 'bg-emerald-50 text-emerald-800 font-bold'
                     : ''
                 }`}

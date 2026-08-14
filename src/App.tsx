@@ -11,14 +11,24 @@ import { Footer } from './components/Footer';
 import { TrackingDetailView } from './components/TrackingDetailView';
 import { DonateModal } from './components/DonateModal';
 import { DonateAndTrackPage } from './components/DonateAndTrackPage';
+import { TrackDonationPage } from './components/TrackDonationPage';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'donate-track'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'donate-track' | 'track'>('home');
   const [activeTrackingId, setActiveTrackingId] = useState<string | null>(null);
   const [isDonateModalOpen, setIsDonateModalOpen] = useState<boolean>(false);
 
   const handleOpenTracker = (sampleId?: string) => {
-    setActiveTrackingId(sampleId || 'AMT-2026-FLOOD-8821');
+    const id = sampleId || 'RR-1042';
+    setActiveTrackingId(id);
+    setCurrentPage('track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenTrackPage = (sampleId?: string) => {
+    setActiveTrackingId(sampleId || 'RR-1042');
+    setCurrentPage('track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCloseTracker = () => {
@@ -40,6 +50,8 @@ export default function App() {
 
   const handleDonationComplete = (newTrackingId: string) => {
     setActiveTrackingId(newTrackingId);
+    setCurrentPage('track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavigateToSection = (sectionId: string) => {
@@ -51,6 +63,12 @@ export default function App() {
     
     if (sectionId === 'donate-track') {
       setCurrentPage('donate-track');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (sectionId === 'track') {
+      setCurrentPage('track');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -80,6 +98,7 @@ export default function App() {
         onOpenTracker={handleOpenTracker}
         onNavigateToSection={handleNavigateToSection}
         onOpenDonateAndTrack={handleOpenDonatePage}
+        onOpenTrackPage={handleOpenTrackPage}
         onDonateClick={handleOpenDonatePage}
       />
 
@@ -88,38 +107,51 @@ export default function App() {
         {currentPage === 'donate-track' ? (
           /* Dedicated "Donate & Track" Page */
           <DonateAndTrackPage
-            onTrackDonation={(id) => setActiveTrackingId(id)}
+            onTrackDonation={(id) => {
+              setActiveTrackingId(id);
+              setCurrentPage('track');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onNavigateHome={() => handleNavigateToSection('home')}
+          />
+        ) : currentPage === 'track' ? (
+          /* Dedicated "Track a Donation" Page */
+          <TrackDonationPage
+            initialTrackingId={activeTrackingId || 'RR-1042'}
+            onNavigateHome={() => handleNavigateToSection('home')}
+            onNavigateDonate={handleOpenDonatePage}
+            onSelectTrackingId={(id) => setActiveTrackingId(id)}
           />
         ) : (
           /* Homepage Sections */
           <>
             {/* Hero Section */}
             <HeroSection
-              onSearchTrackId={(id) => setActiveTrackingId(id)}
+              onSearchTrackId={(id) => handleOpenTrackPage(id)}
               onDonateClick={handleOpenDonatePage}
-              onOpenDemo={(id) => setActiveTrackingId(id)}
+              onOpenDemo={(id) => handleOpenTrackPage(id)}
+              onOpenTrackPage={(id) => handleOpenTrackPage(id)}
             />
 
             {/* Problem vs. Amanat Solution (After you donate, what happens?) */}
             <ProblemSolutionSection 
-              onOpenDemo={() => setActiveTrackingId('AMT-2026-FLOOD-8821')}
+              onOpenDemo={() => handleOpenTrackPage('RR-1042')}
             />
 
             {/* How Amanat Works (4 Simple Steps) */}
             <HowAmanatWorksSection
-              onOpenSampleTracker={(sampleId) => setActiveTrackingId(sampleId)}
+              onOpenSampleTracker={(sampleId) => handleOpenTrackPage(sampleId)}
             />
 
             {/* Visual Courier Tracking Simulation ("Like courier tracking — but for your donation.") */}
             <CourierVisualSection
-              onOpenFullDetail={(id) => setActiveTrackingId(id)}
+              onOpenFullDetail={(id) => handleOpenTrackPage(id)}
               onDonateClick={handleOpenDonatePage}
             />
 
             {/* Active Relief Campaigns in Pakistan */}
             <ActiveCampaignsSection
-              onSelectCampaignForTracking={(sampleId) => setActiveTrackingId(sampleId)}
+              onSelectCampaignForTracking={(sampleId) => handleOpenTrackPage(sampleId)}
             />
 
             {/* Zero-Leakage Verification & Trust Pillars */}
@@ -140,15 +172,6 @@ export default function App() {
         onClose={handleCloseDonateModal}
         onDonationComplete={handleDonationComplete}
       />
-
-      {/* 5. Live Tracking Detail Modal / Audit View */}
-      {activeTrackingId && (
-        <TrackingDetailView
-          trackingId={activeTrackingId}
-          onClose={handleCloseTracker}
-          onSelectAnotherSample={(id) => setActiveTrackingId(id)}
-        />
-      )}
 
     </div>
   );

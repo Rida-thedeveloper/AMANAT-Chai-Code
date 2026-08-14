@@ -22,12 +22,14 @@ interface HeroSectionProps {
   onSearchTrackId: (id: string) => void;
   onDonateClick: () => void;
   onOpenDemo: (id: string) => void;
+  onOpenTrackPage?: (id?: string) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ 
   onSearchTrackId, 
   onDonateClick, 
-  onOpenDemo 
+  onOpenDemo,
+  onOpenTrackPage
 }) => {
   const [trackInput, setTrackInput] = useState('');
   const { isUrdu, t, direction } = useLanguage();
@@ -110,9 +112,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <button
               id="hero-track-btn"
               onClick={() => {
-                const el = document.getElementById('hero-inline-search-input');
-                if (el) el.focus();
-                else onSearchTrackId('AMT-2026-FLOOD-8821');
+                if (onOpenTrackPage) {
+                  onOpenTrackPage('RR-1042');
+                } else {
+                  onSearchTrackId('RR-1042');
+                }
               }}
               className="px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-sm sm:text-base font-bold border border-slate-300 shadow-xs flex items-center gap-2 transition-all cursor-pointer hover:border-slate-400"
             >
@@ -123,7 +127,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* 3. Try Demo (Tertiary Interactive Action) */}
             <button
               id="hero-demo-btn"
-              onClick={() => onOpenDemo('AMT-2026-FLOOD-8821')}
+              onClick={() => {
+                if (onOpenTrackPage) {
+                  onOpenTrackPage('RR-1042');
+                } else {
+                  onOpenDemo('RR-1042');
+                }
+              }}
               className="px-6 py-3.5 rounded-full bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 text-sm sm:text-base font-bold border border-emerald-200 shadow-2xs flex items-center gap-2 transition-all cursor-pointer"
             >
               <PlayCircle className="w-4 h-4 text-emerald-600 shrink-0" />
