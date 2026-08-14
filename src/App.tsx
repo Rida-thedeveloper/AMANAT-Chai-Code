@@ -12,9 +12,10 @@ import { TrackingDetailView } from './components/TrackingDetailView';
 import { DonateModal } from './components/DonateModal';
 import { DonateAndTrackPage } from './components/DonateAndTrackPage';
 import { TrackDonationPage } from './components/TrackDonationPage';
+import { DeliveryDashboardPage } from './components/DeliveryDashboardPage';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'donate-track' | 'track'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'donate-track' | 'track' | 'delivery-dashboard'>('home');
   const [activeTrackingId, setActiveTrackingId] = useState<string | null>(null);
   const [isDonateModalOpen, setIsDonateModalOpen] = useState<boolean>(false);
 
@@ -28,6 +29,11 @@ export default function App() {
   const handleOpenTrackPage = (sampleId?: string) => {
     setActiveTrackingId(sampleId || 'RR-1042');
     setCurrentPage('track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenDeliveryDashboard = () => {
+    setCurrentPage('delivery-dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -73,6 +79,12 @@ export default function App() {
       return;
     }
 
+    if (sectionId === 'delivery-dashboard') {
+      setCurrentPage('delivery-dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     if (currentPage !== 'home') {
       setCurrentPage('home');
       setTimeout(() => {
@@ -99,12 +111,23 @@ export default function App() {
         onNavigateToSection={handleNavigateToSection}
         onOpenDonateAndTrack={handleOpenDonatePage}
         onOpenTrackPage={handleOpenTrackPage}
+        onOpenDeliveryDashboard={handleOpenDeliveryDashboard}
         onDonateClick={handleOpenDonatePage}
       />
 
       {/* 2. Main Page Content */}
       <main className="flex-1">
-        {currentPage === 'donate-track' ? (
+        {currentPage === 'delivery-dashboard' ? (
+          /* Dedicated "Delivery Dashboard" (Volunteer Portal) */
+          <DeliveryDashboardPage
+            onNavigateHome={() => handleNavigateToSection('home')}
+            onNavigateTrack={(id) => {
+              setActiveTrackingId(id);
+              setCurrentPage('track');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        ) : currentPage === 'donate-track' ? (
           /* Dedicated "Donate & Track" Page */
           <DonateAndTrackPage
             onTrackDonation={(id) => {

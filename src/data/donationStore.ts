@@ -327,12 +327,12 @@ export function updateDonationRecord(record: TrackingRecord): void {
 }
 
 /**
- * Reset Demo donation (RR-DEMO-1042) to its initial In Transit state
+ * Reset Demo donation (RR-DEMO-1042) to its initial Assigned / Ready state
  */
 export function resetDemoDonation(): TrackingRecord {
   const initialDemo: TrackingRecord = {
     ...SAMPLE_TRACKING_RECORDS['RR-DEMO-1042'],
-    currentStepIndex: 4, // In Transit active
+    currentStepIndex: 3, // Assigned / In Transit ready
     isDemo: true,
     demoOtp: '8492'
   };
@@ -344,71 +344,141 @@ export function resetDemoDonation(): TrackingRecord {
 }
 
 /**
- * Advance Demo donation to next stage
- * e.g., In Transit (index 4) -> Delivered (index 5) -> Verified (index 6)
+ * Start delivery for a donation (Status -> In Transit)
  */
-export function advanceDemoStage(targetStepKey: 'delivered' | 'verified'): TrackingRecord {
-  const existing = getDonationById('RR-DEMO-1042') || SAMPLE_TRACKING_RECORDS['RR-DEMO-1042'];
+export function startDeliveryForDonation(trackingId: string): TrackingRecord {
+  const existing = getDonationById(trackingId) || SAMPLE_TRACKING_RECORDS[trackingId];
+  if (!existing) {
+    throw new Error(`Donation ${trackingId} not found`);
+  }
+
   const now = new Date();
   const timeStr = `Today, ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
 
-  const updatedSteps = existing.steps.map((step) => {
-    if (targetStepKey === 'delivered') {
-      if (step.key === 'received' || step.key === 'allocated' || step.key === 'prepared' || step.key === 'volunteer_assigned' || step.key === 'in_transit') {
-        return { ...step, status: 'completed' as const };
-      }
-      if (step.key === 'delivered') {
-        return {
-          ...step,
-          status: 'completed' as const,
-          timestamp: timeStr,
-          description: 'Ration packages handed over at beneficiary doorstep.',
-          details: ['Volunteer Muhammad Salman confirmed handover', 'Waiting for recipient OTP verification']
-        };
-      }
-      if (step.key === 'verified') {
-        return {
-          ...step,
-          status: 'current' as const,
-          description: 'Awaiting recipient 4-digit OTP code confirmation.'
-        };
-      }
+  const updatedSteps = (existing.steps || []).map((step) => {
+    if (step.key === 'received' || step.key === 'allocated' || step.key === 'prepared' || step.key === 'volunteer_assigned') {
+      return { ...step, status: 'completed' as const };
     }
-
-    if (targetStepKey === 'verified') {
-      if (step.key !== 'verified') {
-        return { ...step, status: 'completed' as const };
-      }
+    if (step.key === 'in_transit') {
       return {
         ...step,
-        status: 'completed' as const,
+        status: 'current' as const,
         timestamp: timeStr,
-        description: 'Beneficiary authenticated and confirmed delivery via OTP #8492.',
-        details: [
-          'Recipient OTP verified (Demo 8492)',
-          'NADRA Safe Token: FAM-DEMO-UC12-1042',
-          'Audit seal: 100% Zero-Leakage Confirmed'
-        ],
-        proofMedia: {
-          type: 'badge' as const,
-          label: 'Audit Seal: 100% Verified'
-        }
+        description: 'Ration packages are in transit to destination area.'
       };
     }
-
     return step;
   });
 
-  const newStepIndex = targetStepKey === 'delivered' ? 5 : 6;
   const updatedRecord: TrackingRecord = {
     ...existing,
-    currentStepIndex: newStepIndex,
-    deliveredDate: targetStepKey === 'verified' || targetStepKey === 'delivered' ? timeStr : existing.deliveredDate,
+    currentStepIndex: 4, // In Transit
     steps: updatedSteps
   };
 
   updateDonationRecord(updatedRecord);
   return updatedRecord;
+}
+
+/**
+ * Confirm delivery handover for a donation (Status -> Delivered)
+ */
+export function confirmDeliveryForDonation(trackingId: string): TrackingRecord {
+  const existing = getDonationById(trackingId) || SAMPLE_TRACKING_RECORDS[trackingId];
+  if (!existing) {
+    throw new Error(`Donation ${trackingId} not found`);
+  }
+
+  const now = new Date();
+  const timeStr = `Today, ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+
+  const updatedSteps = (existing.steps || []).map((step) => {
+    if (step.key === 'received' || step.key === 'allocated' || step.key === 'prepared' || step.key === 'volunteer_assigned' || step.key === 'in_transit') {
+      return { ...step, status: 'completed' as const };
+    }
+    if (step.key === 'delivered') {
+      return {
+        ...step,
+        status: 'completed' as const,
+        timestamp: timeStr,
+        description: 'Ration packages delivered to doorstep. Recipient verification in progress.',
+        details: ['Handover confirmed by delivery volunteer', 'Awaiting OTP authentication']
+      };
+    }
+    if (step.key === 'verified') {
+      return {
+        ...step,
+        status: 'current' as const,
+        description: 'Awaiting recipient OTP verification code.'
+      };
+    }
+    return step;
+  });
+
+  const updatedRecord: TrackingRecord = {
+    ...existing,
+    currentStepIndex: 5, // Delivered
+    deliveredDate: timeStr,
+    steps: updatedSteps
+  };
+
+  updateDonationRecord(updatedRecord);
+  return updatedRecord;
+}
+
+/**
+ * Verify recipient OTP (Status -> Delivered & Recipient Verified)
+ */
+export function verifyRecipientForDonation(trackingId: string, otpCode: string = '8492'): TrackingRecord {
+  const existing = getDonationById(trackingId) || SAMPLE_TRACKING_RECORDS[trackingId];
+  if (!existing) {
+    throw new Error(`Donation ${trackingId} not found`);
+  }
+
+  const now = new Date();
+  const timeStr = `Today, ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+
+  const updatedSteps = (existing.steps || []).map((step) => {
+    if (step.key !== 'verified') {
+      return { ...step, status: 'completed' as const };
+    }
+    return {
+      ...step,
+      status: 'completed' as const,
+      timestamp: timeStr,
+      description: `Recipient authenticated and confirmed delivery with verification code #${otpCode}.`,
+      details: [
+        `Verification Code: #${otpCode}`,
+        'Audit seal: 100% Zero-Leakage Confirmed'
+      ],
+      proofMedia: {
+        type: 'badge' as const,
+        label: 'Audit Seal: 100% Verified'
+      }
+    };
+  });
+
+  const updatedRecord: TrackingRecord = {
+    ...existing,
+    currentStepIndex: 6, // Verified
+    deliveredDate: existing.deliveredDate || timeStr,
+    steps: updatedSteps
+  };
+
+  updateDonationRecord(updatedRecord);
+  return updatedRecord;
+}
+
+/**
+ * Advance Demo donation to next stage
+ * e.g., In Transit (index 4) -> Delivered (index 5) -> Verified (index 6)
+ */
+export function advanceDemoStage(targetStepKey: 'delivered' | 'verified'): TrackingRecord {
+  if (targetStepKey === 'delivered') {
+    return confirmDeliveryForDonation('RR-DEMO-1042');
+  } else {
+    return verifyRecipientForDonation('RR-DEMO-1042', '8492');
+  }
 }
 
 /**

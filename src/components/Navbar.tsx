@@ -12,11 +12,12 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
-  currentPage?: 'home' | 'donate-track' | 'track';
+  currentPage?: 'home' | 'donate-track' | 'track' | 'delivery-dashboard';
   onOpenTracker: (sampleId?: string) => void;
   onNavigateToSection: (sectionId: string) => void;
   onOpenDonateAndTrack: () => void;
   onOpenTrackPage?: (sampleId?: string) => void;
+  onOpenDeliveryDashboard?: () => void;
   onDonateClick?: () => void;
 }
 
@@ -26,6 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigateToSection, 
   onOpenDonateAndTrack,
   onOpenTrackPage,
+  onOpenDeliveryDashboard,
   onDonateClick 
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -54,11 +56,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: isUrdu ? 'ہوم' : 'Home', id: 'home', isPage: true },
     { label: isUrdu ? 'عطیہ اور ٹریکنگ' : 'Donate & Track', id: 'donate-track', isPage: true },
     { label: isUrdu ? 'عطیہ ٹریک کریں' : 'Track a Donation', id: 'track', isPage: true },
+    { label: isUrdu ? 'ڈیلیوری ڈیش بورڈ' : 'Delivery Dashboard', id: 'delivery-dashboard', isPage: true },
     { label: t('navProblemSolution'), id: 'problem-solution' },
     { label: t('navHowItWorks'), id: 'how-it-works' },
     { label: t('navLiveTracking'), id: 'courier-tracking' },
     { label: t('navActiveDrives'), id: 'active-drives' },
-    { label: t('navTransparency'), id: 'transparency' },
   ];
 
   return (
