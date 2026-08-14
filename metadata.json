@@ -1,0 +1,6 @@
+{
+  "name": "Amanat - Donation Tracking & Transparency",
+  "description": "Donation transparency and real-time tracking platform for Pakistan. Aapki Amanat, Sahi Haathon Tak.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
