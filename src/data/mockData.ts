@@ -100,7 +100,7 @@ export const SAMPLE_TRACKING_RECORDS: Record<string, TrackingRecord> = {
     trackingId: 'AMT-2026-RAMDN-4019',
     donorName: 'Dr. Ayesha S. (LHR-***104)',
     campaignName: 'Ramadan Daily Rashan & Iftar Support',
-    campaignCategory: 'Ramadan Rashan',
+    campaignCategory: 'Ramadan Relief',
     amountPKR: 13000,
     rationBagsCount: 2,
     itemsIncluded: [

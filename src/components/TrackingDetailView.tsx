@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { TrackingRecord, JourneyStep } from '../types';
 import { SAMPLE_TRACKING_RECORDS } from '../data/mockData';
+import { getDonationById } from '../data/donationStore';
 import { useLanguage } from '../context/LanguageContext';
 
 interface TrackingDetailViewProps {
@@ -38,8 +39,9 @@ export const TrackingDetailView: React.FC<TrackingDetailViewProps> = ({
   const [activeTab, setActiveTab] = useState<'timeline' | 'items' | 'volunteer' | 'audit'>('timeline');
   const { isUrdu, t, formatPKR, direction } = useLanguage();
 
-  // Look up in database or create fallback structured sample
-  const record: TrackingRecord = SAMPLE_TRACKING_RECORDS[trackingId] || {
+  // Look up in database or user storage or create fallback structured sample
+  const foundRecord = getDonationById(trackingId);
+  const record: TrackingRecord = foundRecord || SAMPLE_TRACKING_RECORDS[trackingId] || {
     trackingId: trackingId,
     donorName: isUrdu ? 'معزز عطیہ دہندہ (تصدیق شدہ)' : 'Valued Pakistani Donor (Verified)',
     campaignName: isUrdu ? 'سیلاب زدگان ہنگامی راشن مہم' : 'Emergency Ration & Food Security Drive',

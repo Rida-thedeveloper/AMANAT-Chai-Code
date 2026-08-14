@@ -23,11 +23,26 @@ export interface JourneyStep {
   };
 }
 
+export type DonationPurpose = 
+  | 'Ration' 
+  | 'Flood Relief' 
+  | 'Emergency Relief' 
+  | 'Ramadan Relief' 
+  | 'General Relief';
+
+export interface CreateDonationInput {
+  amount: number;
+  purpose: DonationPurpose;
+  donorName?: string;
+  contact?: string;
+}
+
 export interface TrackingRecord {
   trackingId: string;
   donorName: string;
+  donorContact?: string;
   campaignName: string;
-  campaignCategory: 'Flood Relief' | 'Ramadan Rashan' | 'Winter Emergency' | 'Orphan Support' | 'Daily Meal';
+  campaignCategory: DonationPurpose | 'Winter Emergency' | 'Orphan Support' | 'Daily Meal';
   amountPKR: number;
   rationBagsCount: number;
   itemsIncluded: string[];
@@ -42,6 +57,8 @@ export interface TrackingRecord {
   deliveredDate?: string;
   recipientFamilyCode?: string;
   gpsCoordinates?: string;
+  createdAt?: string;
+  isUserCreated?: boolean;
 }
 
 export interface ReliefCampaign {

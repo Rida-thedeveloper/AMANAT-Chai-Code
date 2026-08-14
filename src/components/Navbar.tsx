@@ -12,12 +12,20 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
+  currentPage?: 'home' | 'donate-track';
   onOpenTracker: (sampleId?: string) => void;
   onNavigateToSection: (sectionId: string) => void;
+  onOpenDonateAndTrack: () => void;
   onDonateClick?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSection, onDonateClick }) => {
+export const Navbar: React.FC<NavbarProps> = ({ 
+  currentPage = 'home',
+  onOpenTracker, 
+  onNavigateToSection, 
+  onOpenDonateAndTrack,
+  onDonateClick 
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navSearchId, setNavSearchId] = useState('');
   const { language, setLanguage, isUrdu, t } = useLanguage();
@@ -32,14 +40,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
   };
 
   const handleDonateAction = () => {
-    if (onDonateClick) {
-      onDonateClick();
-    } else {
-      onNavigateToSection('active-drives');
-    }
+    onOpenDonateAndTrack();
   };
 
   const navItems = [
+    { label: isUrdu ? 'ہوم' : 'Home', id: 'home', isPage: true },
+    { label: isUrdu ? 'عطیہ اور ٹریکنگ' : 'Donate & Track', id: 'donate-track', isPage: true },
     { label: t('navProblemSolution'), id: 'problem-solution' },
     { label: t('navHowItWorks'), id: 'how-it-works' },
     { label: t('navLiveTracking'), id: 'courier-tracking' },
@@ -111,16 +117,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => onNavigateToSection(item.id)}
-                className="hover:text-emerald-700 transition-colors py-1 cursor-pointer"
-              >
-                {item.label}
-              </button>
-            ))}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-semibold text-slate-600">
+            {navItems.map((item) => {
+              const isActive = (item.id === 'home' && currentPage === 'home') ||
+                               (item.id === 'donate-track' && currentPage === 'donate-track');
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    if (item.id === 'home') {
+                      onNavigateToSection('home');
+                    } else if (item.id === 'donate-track') {
+                      onOpenDonateAndTrack();
+                    } else {
+                      onNavigateToSection(item.id);
+                    }
+                  }}
+                  className={`transition-colors py-1 cursor-pointer relative ${
+                    isActive 
+                      ? 'text-emerald-700 font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-emerald-600' 
+                      : 'hover:text-emerald-700'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
 
           {/* Search + Action Buttons + Language Switcher */}
@@ -255,10 +278,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenTracker, onNavigateToSecti
               <button
                 key={item.id}
                 onClick={() => {
-                  onNavigateToSection(item.id);
+                  if (item.id === 'home') {
+                    onNavigateToSection('home');
+                  } else if (item.id === 'donate-track') {
+                    onOpenDonateAndTrack();
+                  } else {
+                    onNavigateToSection(item.id);
+                  }
                   setMobileMenuOpen(false);
                 }}
-                className={`text-${isUrdu ? 'right' : 'left'} px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition-colors`}
+                className={`text-${isUrdu ? 'right' : 'left'} px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 transition-colors ${
+                  (item.id === 'home' && currentPage === 'home') || (item.id === 'donate-track' && currentPage === 'donate-track')
+                    ? 'bg-emerald-50 text-emerald-800 font-bold'
+                    : ''
+                }`}
               >
                 {item.label}
               </button>

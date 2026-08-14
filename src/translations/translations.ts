@@ -874,5 +874,163 @@ export const translations: TranslationDictionary = {
   successDonationCreated: {
     en: 'Donation successfully registered! Your tracking ID is ready.',
     ur: 'عطیہ کامیابی سے درج ہو گیا ہے! آپ کی ٹریکنگ آئی ڈی تیار ہے۔'
+  },
+
+  // Donate & Track Page & Flow
+  pageDonateTrackTitle: {
+    en: 'Donate & Track',
+    ur: 'عطیہ دیں اور لائیو ٹریک کریں'
+  },
+  pageDonateTrackSubtitle: {
+    en: 'Create your donation in seconds and follow its exact journey from receipt to verified doorstep handover.',
+    ur: 'چند سیکنڈ میں اپنا عطیہ تخلیق کریں اور موصولی سے لے کر دہلیز پر تصدیق شدہ ترسیل تک اس کا مکمل سفر دیکھیں۔'
+  },
+  donateFieldAmountTitle: {
+    en: '1. Donation Amount',
+    ur: '1. عطیہ کی رقم'
+  },
+  donateFieldAmountSubtitle: {
+    en: 'Select a quick option or enter a custom amount',
+    ur: 'کوئی فوری آپشن منتخب کریں یا اپنی مرضی کی رقم درج کریں'
+  },
+  donateFieldPurposeTitle: {
+    en: '2. Donation Purpose',
+    ur: '2. عطیہ کا مقصد'
+  },
+  donateFieldPurposeSubtitle: {
+    en: 'Choose where your aid will be directed',
+    ur: 'وہ شعبہ منتخب کریں جہاں آپ اپنی امداد لگانا چاہتے ہیں'
+  },
+  donateFieldDonorTitle: {
+    en: '3. Donor Name',
+    ur: '3. عطیہ دہندہ کا نام'
+  },
+  donateFieldDonorOptional: {
+    en: 'Optional',
+    ur: 'اختیاری'
+  },
+  donateFieldDonorPlaceholder: {
+    en: 'e.g. Asad Khan (Leave blank to remain Anonymous)',
+    ur: 'مثلاً محمد اسد (گمنام رہنے کے لیے خالی چھوڑیں)'
+  },
+  donateFieldContactTitle: {
+    en: '4. Contact',
+    ur: '4. رابطہ نمبر'
+  },
+  donateFieldContactOptional: {
+    en: 'Optional',
+    ur: 'اختیاری'
+  },
+  donateFieldContactPlaceholder: {
+    en: 'e.g. 0300-1234567 or email@domain.com (For SMS tracking updates)',
+    ur: 'مثلاً 0300-1234567 یا donor@email.com (ایس ایم ایس اپڈیٹس کے لیے)'
+  },
+  donateCreateBtn: {
+    en: 'Create Donation',
+    ur: 'عطیہ تخلیق کریں'
+  },
+  donateCreatingBtn: {
+    en: 'Processing Donation...',
+    ur: 'عطیہ درج کیا جا رہا ہے...'
+  },
+  donationSuccessTitle: {
+    en: 'Donation Created',
+    ur: 'عطیہ کامیابی سے درج ہو گیا'
+  },
+  donationSuccessSubtitle: {
+    en: 'Your donation has been received and registered with Amanat tracking ledger.',
+    ur: 'آپ کا عطیہ موصول ہو گیا ہے اور امانت ٹریکنگ لیجر میں درج کر دیا گیا ہے۔'
+  },
+  donationAmountLabel: {
+    en: 'Amount:',
+    ur: 'رقم:'
+  },
+  donationIdLabel: {
+    en: 'Donation ID:',
+    ur: 'ڈونیشن آئی ڈی:'
+  },
+  donationStatusLabel: {
+    en: 'Status:',
+    ur: 'حیثیت:'
+  },
+  donationStatusReceived: {
+    en: 'Donation Received',
+    ur: 'عطیہ موصول ہوا'
+  },
+  donationSaveIdNotice: {
+    en: 'Save this ID to track your donation.',
+    ur: 'اپنی عطیہ ٹریک کرنے کے لیے یہ آئی ڈی محفوظ رکھیں۔'
+  },
+  btnTrackMyDonation: {
+    en: 'Track My Donation',
+    ur: 'میرا عطیہ ٹریک کریں'
+  },
+  btnCopyDonationId: {
+    en: 'Copy Donation ID',
+    ur: 'ڈونیشن آئی ڈی کاپی کریں'
+  },
+  btnCopied: {
+    en: 'Copied!',
+    ur: 'کاپی ہو گئی!'
+  },
+  btnCreateAnother: {
+    en: 'Create Another Donation',
+    ur: 'ایک اور عطیہ تخلیق کریں'
+  },
+  recentDonationsTitle: {
+    en: 'Your Saved Donations & Tracking History',
+    ur: 'آپ کے محفوظ شدہ عطیات اور ٹریکنگ ہسٹری'
+  },
+  recentDonationsSubtitle: {
+    en: 'All donations generated in this browser session are securely stored in your local history.',
+    ur: 'اس براؤزر سیشن میں تخلیق کردہ تمام عطیات آپ کی لوکل ہسٹری میں محفوظ ہیں۔'
+  },
+  recentDonationsEmpty: {
+    en: 'No donations created in this browser yet. Use the form above to create your first trackable donation!',
+    ur: 'اس براؤزر میں ابھی تک کوئی عطیہ نہیں بنایا گیا۔ اپنا پہلا ٹریک ایبل عطیہ بنانے کے لیے اوپر والا فارم استعمال کریں!'
+  },
+  customAmountLabel: {
+    en: 'Custom amount',
+    ur: 'اپنی مرضی کی رقم'
+  },
+  purposeRation: {
+    en: 'Ration',
+    ur: 'راشن'
+  },
+  purposeFloodRelief: {
+    en: 'Flood Relief',
+    ur: 'سیلاب ریلیف'
+  },
+  purposeEmergencyRelief: {
+    en: 'Emergency Relief',
+    ur: 'ہنگامی ریلیف'
+  },
+  purposeRamadanRelief: {
+    en: 'Ramadan Relief',
+    ur: 'رمضان ریلیف'
+  },
+  purposeGeneralRelief: {
+    en: 'General Relief',
+    ur: 'عمومی ریلیف'
+  },
+  purposeRationDesc: {
+    en: 'Monthly staple nutrition & ration pack for vulnerable households.',
+    ur: 'مستحق خاندانوں کے لیے 30 دن کا ماہانہ ضروری راشن پیکج۔'
+  },
+  purposeFloodReliefDesc: {
+    en: 'Urgent food, clean water tablets and shelter for flood-hit areas.',
+    ur: 'سیلاب متاثرہ علاقوں کے لیے ہنگامی راشن، صاف پانی اور بنیادی اشیاء۔'
+  },
+  purposeEmergencyReliefDesc: {
+    en: 'Immediate survival aid, ready meals, and medicine for crises.',
+    ur: 'قدرتی آفات اور ہنگامی حالات میں فوری خوراک اور طبی ریلیف۔'
+  },
+  purposeRamadanReliefDesc: {
+    en: 'Sehri & Iftar ration basket with flour, oil, dates, and drinks.',
+    ur: 'رمضان المبارک میں سحر و افطار کے لیے خصوصی غذائی پیکج۔'
+  },
+  purposeGeneralReliefDesc: {
+    en: 'Flexible emergency relief directed to the highest distress zone.',
+    ur: 'سب سے زیادہ ضرورت مند اور پسماندہ علاقے کے لیے عمومی ریلیف۔'
   }
 };

@@ -10,8 +10,10 @@ import { PartnersSection } from './components/PartnersSection';
 import { Footer } from './components/Footer';
 import { TrackingDetailView } from './components/TrackingDetailView';
 import { DonateModal } from './components/DonateModal';
+import { DonateAndTrackPage } from './components/DonateAndTrackPage';
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'donate-track'>('home');
   const [activeTrackingId, setActiveTrackingId] = useState<string | null>(null);
   const [isDonateModalOpen, setIsDonateModalOpen] = useState<boolean>(false);
 
@@ -21,6 +23,11 @@ export default function App() {
 
   const handleCloseTracker = () => {
     setActiveTrackingId(null);
+  };
+
+  const handleOpenDonatePage = () => {
+    setCurrentPage('donate-track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenDonateModal = () => {
@@ -36,9 +43,31 @@ export default function App() {
   };
 
   const handleNavigateToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (sectionId === 'home') {
+      setCurrentPage('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
+    if (sectionId === 'donate-track') {
+      setCurrentPage('donate-track');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (currentPage !== 'home') {
+      setCurrentPage('home');
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -47,48 +76,59 @@ export default function App() {
       
       {/* 1. Sticky Navigation Bar */}
       <Navbar
+        currentPage={currentPage}
         onOpenTracker={handleOpenTracker}
         onNavigateToSection={handleNavigateToSection}
-        onDonateClick={handleOpenDonateModal}
+        onOpenDonateAndTrack={handleOpenDonatePage}
+        onDonateClick={handleOpenDonatePage}
       />
 
-      {/* 2. Main Page Sections */}
+      {/* 2. Main Page Content */}
       <main className="flex-1">
-        
-        {/* Hero Section */}
-        <HeroSection
-          onSearchTrackId={(id) => setActiveTrackingId(id)}
-          onDonateClick={handleOpenDonateModal}
-          onOpenDemo={(id) => setActiveTrackingId(id)}
-        />
+        {currentPage === 'donate-track' ? (
+          /* Dedicated "Donate & Track" Page */
+          <DonateAndTrackPage
+            onTrackDonation={(id) => setActiveTrackingId(id)}
+            onNavigateHome={() => handleNavigateToSection('home')}
+          />
+        ) : (
+          /* Homepage Sections */
+          <>
+            {/* Hero Section */}
+            <HeroSection
+              onSearchTrackId={(id) => setActiveTrackingId(id)}
+              onDonateClick={handleOpenDonatePage}
+              onOpenDemo={(id) => setActiveTrackingId(id)}
+            />
 
-        {/* Problem vs. Amanat Solution (After you donate, what happens?) */}
-        <ProblemSolutionSection 
-          onOpenDemo={() => setActiveTrackingId('AMT-2026-FLOOD-8821')}
-        />
+            {/* Problem vs. Amanat Solution (After you donate, what happens?) */}
+            <ProblemSolutionSection 
+              onOpenDemo={() => setActiveTrackingId('AMT-2026-FLOOD-8821')}
+            />
 
-        {/* How Amanat Works (4 Simple Steps) */}
-        <HowAmanatWorksSection
-          onOpenSampleTracker={(sampleId) => setActiveTrackingId(sampleId)}
-        />
+            {/* How Amanat Works (4 Simple Steps) */}
+            <HowAmanatWorksSection
+              onOpenSampleTracker={(sampleId) => setActiveTrackingId(sampleId)}
+            />
 
-        {/* Visual Courier Tracking Simulation ("Like courier tracking — but for your donation.") */}
-        <CourierVisualSection
-          onOpenFullDetail={(id) => setActiveTrackingId(id)}
-          onDonateClick={handleOpenDonateModal}
-        />
+            {/* Visual Courier Tracking Simulation ("Like courier tracking — but for your donation.") */}
+            <CourierVisualSection
+              onOpenFullDetail={(id) => setActiveTrackingId(id)}
+              onDonateClick={handleOpenDonatePage}
+            />
 
-        {/* Active Relief Campaigns in Pakistan */}
-        <ActiveCampaignsSection
-          onSelectCampaignForTracking={(sampleId) => setActiveTrackingId(sampleId)}
-        />
+            {/* Active Relief Campaigns in Pakistan */}
+            <ActiveCampaignsSection
+              onSelectCampaignForTracking={(sampleId) => setActiveTrackingId(sampleId)}
+            />
 
-        {/* Zero-Leakage Verification & Trust Pillars */}
-        <TransparencyAuditSection />
+            {/* Zero-Leakage Verification & Trust Pillars */}
+            <TransparencyAuditSection />
 
-        {/* Vetted Ground Partners */}
-        <PartnersSection />
-
+            {/* Vetted Ground Partners */}
+            <PartnersSection />
+          </>
+        )}
       </main>
 
       {/* 3. Footer */}

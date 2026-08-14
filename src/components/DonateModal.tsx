@@ -14,6 +14,8 @@ import {
   Lock
 } from 'lucide-react';
 import { RELIEF_CAMPAIGNS } from '../data/mockData';
+import { createDonation } from '../data/donationStore';
+import { DonationPurpose } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
 interface DonateModalProps {
@@ -59,12 +61,29 @@ export const DonateModal: React.FC<DonateModalProps> = ({
 
     setTimeout(() => {
       setIsSubmitting(false);
-      // Generate a mock unique tracking ID
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const generatedId = `AMT-2026-LIVE-${randomSuffix}`;
-      onDonationComplete(generatedId);
+      
+      const currentCamp = RELIEF_CAMPAIGNS.find(c => c.id === selectedCampaignId) || RELIEF_CAMPAIGNS[0];
+      
+      // Determine purpose
+      let mappedPurpose: DonationPurpose = 'Ration';
+      if (currentCamp.category.toLowerCase().includes('flood')) {
+        mappedPurpose = 'Flood Relief';
+      } else if (currentCamp.category.toLowerCase().includes('ramadan')) {
+        mappedPurpose = 'Ramadan Relief';
+      } else if (currentCamp.category.toLowerCase().includes('emergency') || currentCamp.category.toLowerCase().includes('winter')) {
+        mappedPurpose = 'Emergency Relief';
+      }
+
+      const record = createDonation({
+        amount: amount,
+        purpose: mappedPurpose,
+        donorName: isAnonymous ? undefined : (donorName.trim() || undefined),
+        contact: phone.trim() || undefined
+      });
+
+      onDonationComplete(record.trackingId);
       onClose();
-    }, 1000);
+    }, 800);
   };
 
   const currentCampaign = RELIEF_CAMPAIGNS.find(c => c.id === selectedCampaignId) || RELIEF_CAMPAIGNS[0];
